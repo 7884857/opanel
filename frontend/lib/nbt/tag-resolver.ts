@@ -138,4 +138,15 @@ export class TagResolver extends ItemNBTResolver {
     const mapId = this.nbt.get<NbtNumber>("map")?.value;
     return mapId !== undefined ? mapId : null;
   }
+
+  override getDyedColor(): RgbColor | null {
+    const dyedColor = this.nbt.get<NbtNumber>(["display", "color"]);
+    if(dyedColor === undefined) return null;
+
+    const hexStr = dyedColor.value.toString(16).padStart(6, "0");
+    const r = parseInt(hexStr.slice(0, 2), 16);
+    const g = parseInt(hexStr.slice(2, 4), 16);
+    const b = parseInt(hexStr.slice(4, 6), 16);
+    return [r, g, b];
+  }
 }

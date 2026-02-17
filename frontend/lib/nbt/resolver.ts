@@ -37,4 +37,15 @@ export abstract class ItemNBTResolver {
   abstract getPotionColor(): RgbColor | null;
   abstract getItemModel(): string | null;
   abstract getMapId(): number | null;
+
+  isLeatherArmor(): boolean {
+    return [
+      "minecraft:leather_helmet",
+      "minecraft:leather_chestplate",
+      "minecraft:leather_leggings",
+      "minecraft:leather_boots"
+    ].includes(this.id);
+  }
+
+  abstract getDyedColor(): RgbColor | null;
 }

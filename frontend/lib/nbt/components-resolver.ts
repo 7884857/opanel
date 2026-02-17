@@ -1,7 +1,7 @@
 import {
   type NbtBool,
-  type NbtList,
-  type NbtNumber,
+  NbtList,
+  NbtNumber,
   NbtObject,
   NbtString
 } from "snbt-js";
@@ -158,5 +158,23 @@ export class ComponentsResolver extends ItemNBTResolver {
   override getMapId(): number | null {
     const mapId = this.nbt.get<NbtNumber>("minecraft:map_id")?.value;
     return mapId !== undefined ? mapId : null;
+  }
+
+  override getDyedColor(): RgbColor | null {
+    const dyedColor = this.nbt.get<NbtNumber | NbtList>("minecraft:dyed_color");
+    if(dyedColor instanceof NbtNumber) {
+      const hexStr = dyedColor.value.toString(16).padStart(6, "0");
+      const r = parseInt(hexStr.slice(0, 2), 16);
+      const g = parseInt(hexStr.slice(2, 4), 16);
+      const b = parseInt(hexStr.slice(4, 6), 16);
+      return [r, g, b];
+    }
+    if(dyedColor instanceof NbtList) {
+      const r = (dyedColor.childs[0] as NbtNumber).value * 255;
+      const g = (dyedColor.childs[1] as NbtNumber).value * 255;
+      const b = (dyedColor.childs[2] as NbtNumber).value * 255;
+      return [r, g, b];
+    }
+    return null;
   }
 }

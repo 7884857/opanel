@@ -18,15 +18,34 @@ import { VersionContext } from "@/contexts/api-context";
 import { createResolver } from "@/lib/nbt";
 import { ComponentsResolver, itemModelToTextureId } from "@/lib/nbt/components-resolver";
 
-import GlintTexture from "@/assets/images/enchanted-glint.png";
-import PotionOverlayTexture from "@/assets/images/potion-overlay.png";
-import TippedArrowOverlayTexture from "@/assets/images/tipped-arrow-overlay.png";
+import GlintTexture from "@/assets/images/overlays/enchanted-glint.png";
+import PotionOverlayTexture from "@/assets/images/overlays/potion-overlay.png";
+import TippedArrowOverlayTexture from "@/assets/images/overlays/tipped-arrow-overlay.png";
+import LeatherHelmetOverlayTexture from "@/assets/images/overlays/leather-helmet-overlay.png";
+import LeatherChestplateOverlayTexture from "@/assets/images/overlays/leather-chestplate-overlay.png";
+import LeatherLeggingsOverlayTexture from "@/assets/images/overlays/leather-leggings-overlay.png";
+import LeatherBootsOverlayTexture from "@/assets/images/overlays/leather-boots-overlay.png";
 import "@/style/item-effect.css";
 
 export const AIR = "minecraft:air";
 
 function isFromExplorer(itemStack: ItemStack) {
   return itemStack.slot === -1;
+}
+
+function getLeatherOverlay(id: string): string | null {
+  switch(id) {
+    case "minecraft:leather_helmet":
+      return LeatherHelmetOverlayTexture.src;
+    case "minecraft:leather_chestplate":
+      return LeatherChestplateOverlayTexture.src;
+    case "minecraft:leather_leggings":
+      return LeatherLeggingsOverlayTexture.src;
+    case "minecraft:leather_boots":
+      return LeatherBootsOverlayTexture.src;
+    default:
+      return null;
+  }
 }
 
 export function InventoryItem({
@@ -220,7 +239,7 @@ export function InventoryItem({
           {/* Enchanted Glint Effect */}
           {resolvedNBT.shouldGlint() && (
             <div
-              className="item-glint absolute inset-0 top-0 left-0 z-10"
+              className="item-glint"
               style={{
                 backgroundImage: `url(${GlintTexture.src})`,
                 maskImage: `url(${textureItem ? textureItem.texture : ""})`,
@@ -230,7 +249,7 @@ export function InventoryItem({
           {/* Potion Color Overlay */}
           {resolvedNBT.isPotion() && (
             <div
-              className="item-potion-overlay absolute inset-0 top-0 left-0 z-10"
+              className="color-overlay"
               style={{
                 backgroundImage: `url(${PotionOverlayTexture.src})`,
                 backgroundColor: `rgb(${resolvedNBT.getPotionColor()?.join(",")})`,
@@ -241,12 +260,23 @@ export function InventoryItem({
           {/* Tipped Arrow Color Overlay */}
           {resolvedNBT.isTippedArrow() && (
             <div
-              className="item-potion-overlay absolute inset-0 top-0 left-0 z-10"
+              className="color-overlay"
               style={{
                 backgroundImage: `url(${TippedArrowOverlayTexture.src})`,
                 backgroundColor: `rgb(${resolvedNBT.getPotionColor()?.join(",")})`,
                 maskImage: `url(${TippedArrowOverlayTexture.src})`,
                 WebkitMaskImage: `url(${TippedArrowOverlayTexture.src})`
+              }}/>
+          )}
+          {/* Leather Armor Color Overlay */}
+          {resolvedNBT.isLeatherArmor() && (
+            <div
+              className="color-overlay"
+              style={{
+                backgroundImage: `url(${getLeatherOverlay(itemStack.id)})`,
+                backgroundColor: `rgb(${resolvedNBT.getDyedColor()?.join(",")})`,
+                maskImage: `url(${getLeatherOverlay(itemStack.id)})`,
+                WebkitMaskImage: `url(${getLeatherOverlay(itemStack.id)})`
               }}/>
           )}
         </>
