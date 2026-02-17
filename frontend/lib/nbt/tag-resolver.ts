@@ -121,4 +121,9 @@ export class TagResolver extends ItemNBTResolver {
   override getItemModel(): string | null {
     return null;
   }
+
+  override getMapId(): number | null {
+    const mapId = this.nbt.get<NbtNumber>("map")?.value;
+    return mapId !== undefined ? mapId : null;
+  }
 }

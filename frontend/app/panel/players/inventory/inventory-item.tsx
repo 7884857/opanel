@@ -273,7 +273,7 @@ export function InventoryItem({
             </div>
           )}
           {/* Lore */}
-          {resolvedNBT && resolvedNBT.getLore().length > 0 && (
+          {(resolvedNBT && resolvedNBT.getLore().length > 0) && (
             <div className="flex flex-col gap-0 mb-4 cc-5 italic">
               {resolvedNBT.getLore().map((line, i) => (
                 <span key={i}>{line}</span>
@@ -283,6 +283,12 @@ export function InventoryItem({
           {/* Unbreakable */}
           {resolvedNBT?.isUnbreakable() && (
             <span className="cc-9">{$("item.unbreakable")}</span>
+          )}
+          {/* Map ID */}
+          {(resolvedNBT && resolvedNBT.getMapId() !== null) && (
+            <span className="cc-7">
+              {$("filled_map.id" as any).replace("%s", resolvedNBT.getMapId()?.toString() ?? "")}
+            </span>
           )}
           {/* Item ID */}
           <span className="cc-7">{itemStack.id}</span>

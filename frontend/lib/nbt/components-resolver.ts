@@ -144,4 +144,9 @@ export class ComponentsResolver extends ItemNBTResolver {
     const model = this.nbt.get<NbtString>("minecraft:item_model")?.value;
     return model ?? null;
   }
+
+  override getMapId(): number | null {
+    const mapId = this.nbt.get<NbtNumber>("minecraft:map_id")?.value;
+    return mapId !== undefined ? mapId : null;
+  }
 }

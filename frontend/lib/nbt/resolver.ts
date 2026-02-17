@@ -35,4 +35,5 @@ export abstract class ItemNBTResolver {
   abstract getPotionId(): string | null;
   abstract getPotionColor(): RgbColor | null;
   abstract getItemModel(): string | null;
+  abstract getMapId(): number | null;
 }

@@ -2,8 +2,8 @@ import type { GameMode, ServerType, SetState } from "./types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import locale from "locale-codes";
-import { $ } from "./i18n";
 import { NbtObject, NbtString } from "snbt-js";
+import { $ } from "./i18n";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
