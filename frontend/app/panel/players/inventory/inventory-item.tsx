@@ -16,11 +16,12 @@ import { ItemDialog } from "./item-dialog";
 import { $, $mc } from "@/lib/i18n";
 import { VersionContext } from "@/contexts/api-context";
 import { createResolver } from "@/lib/nbt";
+import { ComponentsResolver, itemModelToTextureId } from "@/lib/nbt/components-resolver";
 
 import GlintTexture from "@/assets/images/enchanted-glint.png";
 import PotionOverlayTexture from "@/assets/images/potion-overlay.png";
+import TippedArrowOverlayTexture from "@/assets/images/tipped-arrow-overlay.png";
 import "@/style/item-effect.css";
-import { ComponentsResolver, itemModelToTextureId } from "@/lib/nbt/components-resolver";
 
 export const AIR = "minecraft:air";
 
@@ -235,6 +236,17 @@ export function InventoryItem({
                 backgroundColor: `rgb(${resolvedNBT.getPotionColor()?.join(",")})`,
                 maskImage: `url(${PotionOverlayTexture.src})`,
                 WebkitMaskImage: `url(${PotionOverlayTexture.src})`
+              }}/>
+          )}
+          {/* Tipped Arrow Color Overlay */}
+          {resolvedNBT.isTippedArrow() && (
+            <div
+              className="item-potion-overlay absolute inset-0 top-0 left-0 z-10"
+              style={{
+                backgroundImage: `url(${TippedArrowOverlayTexture.src})`,
+                backgroundColor: `rgb(${resolvedNBT.getPotionColor()?.join(",")})`,
+                maskImage: `url(${TippedArrowOverlayTexture.src})`,
+                WebkitMaskImage: `url(${TippedArrowOverlayTexture.src})`
               }}/>
           )}
         </>

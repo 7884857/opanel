@@ -92,18 +92,30 @@ export class TagResolver extends ItemNBTResolver {
   }
 
   override isPotion(): boolean {
-    return this.hasTag("Potion") || this.hasTag("CustomPotionColor");
+    return (this.hasTag("Potion") || this.hasTag("CustomPotionColor")) && (
+      [
+        "minecraft:potion",
+        "minecraft:splash_potion",
+        "minecraft:lingering_potion"
+      ].includes(this.id)
+    );
+  }
+
+  override isTippedArrow(): boolean {
+    return (this.hasTag("Potion") || this.hasTag("CustomPotionColor")) && (
+      this.id === "minecraft:tipped_arrow"
+    );
   }
 
   override getPotionId(): string | null {
-    if(!this.isPotion()) return null;
+    if(!this.isPotion() && !this.isTippedArrow()) return null;
 
     const potionId = this.nbt.get<NbtString>("Potion")?.value ?? "minecraft:empty";
     return potionId.replace(/long_|strong_/g, "");
   }
 
   override getPotionColor(): RgbColor | null {
-    if(!this.isPotion()) return null;
+    if(!this.isPotion() && !this.isTippedArrow()) return null;
 
     const customColor = this.nbt.get<NbtNumber>("CustomPotionColor")?.value;
     if(customColor !== undefined) {

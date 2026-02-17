@@ -114,18 +114,28 @@ export class ComponentsResolver extends ItemNBTResolver {
   }
 
   override isPotion(): boolean {
-    return this.hasComponent("minecraft:potion_contents");
+    return this.hasComponent("minecraft:potion_contents") && (
+      [
+        "minecraft:potion",
+        "minecraft:splash_potion",
+        "minecraft:lingering_potion"
+      ].includes(this.id)
+    );
+  }
+
+  override isTippedArrow(): boolean {
+    return this.hasComponent("minecraft:potion_contents") && this.id === "minecraft:tipped_arrow";
   }
 
   override getPotionId(): string | null {
-    if(!this.isPotion()) return null;
+    if(!this.isPotion() && !this.isTippedArrow()) return null;
 
     const potionId = this.nbt.get<NbtString>(["minecraft:potion_contents", "potion"])?.value ?? "minecraft:empty";
     return potionId.replace(/long_|strong_/g, "");
   }
 
   override getPotionColor(): RgbColor | null {
-    if(!this.isPotion()) return null;
+    if(!this.isPotion() && !this.isTippedArrow()) return null;
 
     const customColor = this.nbt.get<NbtNumber>(["minecraft:potion_contents", "custom_color"]);
     if(customColor !== undefined) {

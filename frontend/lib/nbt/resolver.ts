@@ -32,6 +32,7 @@ export abstract class ItemNBTResolver {
   abstract getDamage(): number | null;
   abstract isUnbreakable(): boolean;
   abstract isPotion(): boolean;
+  abstract isTippedArrow(): boolean;
   abstract getPotionId(): string | null;
   abstract getPotionColor(): RgbColor | null;
   abstract getItemModel(): string | null;
