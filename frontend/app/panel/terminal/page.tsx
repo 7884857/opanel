@@ -7,7 +7,7 @@ import {
   useRef,
   useState
 } from "react";
-import { ArrowUp, SquareTerminal, Trash2 } from "lucide-react";
+import { ArrowUp, Maximize, Minimize, SquareTerminal, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useWebSocket } from "@/hooks/use-websocket";
 import { TerminalConnector } from "@/components/terminal-connector";
@@ -30,17 +30,13 @@ import { type ConsoleLogLevel, defaultLogLevel, TerminalClient } from "@/lib/ws/
 
 export default function Terminal() {
   const client = useWebSocket(TerminalClient);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const terminalContainerRef = useRef<HTMLDivElement | null>(null);
   const argIndexRef = useRef(0);
   const [autocompleteList, setAutocompleteList] = useState<string[]>([]);
   const [historyList, setHistoryList] = useState<string[]>(getSettings("state.terminal.history"));
   const [logLevel, setLogLevel] = useState(defaultLogLevel);
-
-  const handleClear = () => {
-    if(!inputRef.current) return;
-
-    inputRef.current.value = "";
-  };
+  const [fullscreen, setFullscreen] = useState(false);
 
   const handleSend = useCallback(() => {
     if(!inputRef.current || !client) return;
@@ -54,7 +50,8 @@ export default function Terminal() {
     client.send("command", command);
     argIndexRef.current = 0;
     setHistoryList((current) => [...current, command]);
-    handleClear();
+    inputRef.current.value = "";
+    inputRef.current?.focus();
   }, [client]);
 
   const handleKeydown = (e: KeyboardEvent) => {
@@ -87,6 +84,25 @@ export default function Terminal() {
     }
   }, [client]);
 
+  const handleFullscreen = () => {
+    if(!terminalContainerRef.current) return;
+
+    const terminalContainer = terminalContainerRef.current;
+    if(!document.fullscreenElement && !fullscreen) {
+      terminalContainer.requestFullscreen();
+      setFullscreen(true);
+    } else if(document.fullscreenElement && fullscreen) {
+      document.exitFullscreen();
+      setFullscreen(false);
+    }
+
+    inputRef.current?.focus();
+  };
+
+  const handleFullscreenChange = (e: Event) => {
+    setFullscreen(!!document.fullscreenElement);
+  };
+
   useEffect(() => {
     client?.subscribe("autocomplete", (data: string[]) => {
       setAutocompleteList(data);
@@ -97,6 +113,12 @@ export default function Terminal() {
     changeSettings("state.terminal.history", historyList);
   }, [historyList]);
 
+  useEffect(() => {
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
   return (
     <SubPage
       title={$("terminal.title")}
@@ -104,7 +126,9 @@ export default function Terminal() {
       icon={<SquareTerminal />}
       outerClassName="max-h-screen overflow-y-hidden"
       className="flex-1 min-h-0 flex gap-3">
-      <div className="bg-background flex-4/5 max-lg:flex-3/4 max-md:flex-2/3 min-w-0 flex flex-col border rounded-sm">
+      <div
+        className="bg-background flex-4/5 max-lg:flex-3/4 max-md:flex-2/3 min-w-0 flex flex-col border rounded-sm"
+        ref={terminalContainerRef}>
         <TerminalConnector client={client} level={logLevel} className="flex-1 border-none"/>
         <div className="p-3 flex gap-2">
           <Select
@@ -130,6 +154,14 @@ export default function Terminal() {
             onKeyDown={(e) => handleKeydown(e)}
             onInput={() => handleInput()}
             ref={inputRef}/>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="cursor-pointer"
+            title={fullscreen ? $("terminal.exit-fullscreen") : $("terminal.fullscreen")}
+            onClick={() => handleFullscreen()}>
+            {fullscreen ? <Minimize /> : <Maximize />}
+          </Button>
           <Button
             size="icon"
             className="cursor-pointer"
