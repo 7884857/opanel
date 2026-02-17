@@ -38,12 +38,6 @@ export default function Terminal() {
   const [logLevel, setLogLevel] = useState(defaultLogLevel);
   const [fullscreen, setFullscreen] = useState(false);
 
-  const handleClear = () => {
-    if(!inputRef.current) return;
-
-    inputRef.current.value = "";
-  };
-
   const handleSend = useCallback(() => {
     if(!inputRef.current || !client) return;
 
@@ -56,7 +50,8 @@ export default function Terminal() {
     client.send("command", command);
     argIndexRef.current = 0;
     setHistoryList((current) => [...current, command]);
-    handleClear();
+    inputRef.current.value = "";
+    inputRef.current?.focus();
   }, [client]);
 
   const handleKeydown = (e: KeyboardEvent) => {
@@ -100,6 +95,8 @@ export default function Terminal() {
       document.exitFullscreen();
       setFullscreen(false);
     }
+
+    inputRef.current?.focus();
   };
 
   const handleFullscreenChange = (e: Event) => {
