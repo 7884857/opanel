@@ -269,7 +269,7 @@ export function InventoryItem({
               }}/>
           )}
           {/* Leather Armor Color Overlay */}
-          {resolvedNBT.isLeatherArmor() && (
+          {resolvedNBT.isDyedLeatherArmor() && (
             <div
               className="color-overlay"
               style={{
