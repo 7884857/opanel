@@ -1,7 +1,8 @@
 package net.opanel.storage;
 
 public enum StorageKey {
-    SCHEDULED_TASKS("scheduled-tasks");
+    SCHEDULED_TASKS("scheduled-tasks"),
+    MCP_CONFIG("mcp-config");
 
     private final String id;
 

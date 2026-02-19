@@ -12,6 +12,8 @@
   "common.difficulty.easy": "簡單",
   "common.difficulty.normal": "普通",
   "common.difficulty.hard": "困難",
+  "common.copy.success": "複製成功",
+  "common.copy.error": "複製失敗",
 
   "about": "關於",
   "about.title": "關於",
@@ -93,6 +95,8 @@
   "table.previous": "上一頁",
   "table.next": "下一頁",
   "table.status": "第 {0} 頁 / 共 {1} 頁",
+
+  "text-copy.copy": "點擊複製",
 
   "dashboard.title": "儀表板",
   "dashboard.error": "無法連接到伺服器",
@@ -463,6 +467,25 @@
   "tasks.form.commands.description": "用換行分開，按順序逐一執行。",
   "tasks.form.commands.empty1": "指令唔可以係空",
   "tasks.form.commands.empty2": "至少需要一條指令",
+
+  "mcp.description": "配置MCP伺服器，令大語言模型可以操作OPanel",
+  "mcp.fetch-enabled.error": "獲取MCP狀態失敗",
+  "mcp.fetch-token.error": "獲取訪問令牌失敗",
+  "mcp.toggle.enable.error": "啟用MCP功能失敗",
+  "mcp.toggle.enable.error.403": "未設定訪問令牌",
+  "mcp.toggle.disable.error": "禁用MCP功能失敗",
+  "mcp.item.enabled": "啟用MCP",
+  "mcp.item.enabled.description": "基於安全考慮，啟用MCP前需建立訪問令牌，且伺服器必須支援HTTPS先可以進行MCP連線",
+  "mcp.item.access-token": "訪問令牌",
+  "mcp.item.config": "MCP配置",
+  "mcp.token.not-generated": "未生成訪問令牌",
+  "mcp.token.generate": "生成",
+  "mcp.config.access-token-placeholder": "你嘅訪問令牌",
+  "mcp.dialog.generate.error": "生成訪問令牌失敗",
+  "mcp.dialog.title": "生成MCP訪問令牌",
+  "mcp.dialog.description": "請妥善保管你嘅訪問令牌，生成後將無法再次查看完整令牌內容。",
+  "mcp.dialog.status.generating": "正在生成訪問令牌...",
+  "mcp.dialog.status.error": "訪問令牌生成失敗",
 
   "bukkit-config.title": "Bukkit 設定",
   "bukkit-config.description": "編輯Bukkit的服務端配置文件",

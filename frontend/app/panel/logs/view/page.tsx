@@ -97,6 +97,7 @@ export default function LogView() {
           readOnlyMessage: {
             value: $("logs.view.monaco.readonly")
           },
+          contextmenu: false,
           ...monacoSettingsOptions
         }}
         className="border rounded-md overflow-hidden"

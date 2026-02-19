@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Fragment, useContext } from "react";
 import { compare } from "semver";
 import { Blocks, ClockFading, Earth, Gauge, HeartHandshake, PaintBucket, PencilRuler, ScrollText, SquareTerminal, Users } from "lucide-react";
+import { SiModelcontextprotocol } from "@icons-pack/react-simple-icons";
 import {
   Sidebar,
   SidebarContent,
@@ -82,6 +83,11 @@ const configurationGroupItems = [
     name: $("sidebar.config.bukkit-config"),
     url: "/panel/bukkit-config",
     icon: PaintBucket
+  },
+  {
+    name: "MCP",
+    url: "/panel/mcp",
+    icon: SiModelcontextprotocol
   }
 ];
 

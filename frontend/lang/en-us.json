@@ -12,6 +12,8 @@
   "common.difficulty.easy": "Easy",
   "common.difficulty.normal": "Normal",
   "common.difficulty.hard": "Hard",
+  "common.copy.success": "Copied",
+  "common.copy.error": "Copy failed",
 
   "about": "About",
   "about.title": "About",
@@ -93,6 +95,8 @@
   "table.previous": "Previous",
   "table.next": "Next",
   "table.status": "Page {0} of {1}",
+
+  "text-copy.copy": "Click to copy",
 
   "dashboard.title": "Dashboard",
   "dashboard.error": "Unable to connect to the server",
@@ -463,6 +467,25 @@
   "tasks.form.commands.description": "Separate commands with new lines and they'll be executed in order.",
   "tasks.form.commands.empty1": "Commands cannot be empty",
   "tasks.form.commands.empty2": "At least one command is required",
+
+  "mcp.description": "Configure the MCP server so LLMs can get access to OPanel",
+  "mcp.fetch-enabled.error": "Failed to get MCP status",
+  "mcp.fetch-token.error": "Failed to get access token",
+  "mcp.toggle.enable.error": "Failed to enable MCP",
+  "mcp.toggle.enable.error.403": "Access token is not set",
+  "mcp.toggle.disable.error": "Failed to disable MCP",
+  "mcp.item.enabled": "Enable MCP",
+  "mcp.item.enabled.description": "For security, create an access token before enabling MCP and ensure the server supports HTTPS for MCP connections",
+  "mcp.item.access-token": "Access Token",
+  "mcp.item.config": "MCP Config",
+  "mcp.token.not-generated": "Access token not generated",
+  "mcp.token.generate": "Generate",
+  "mcp.config.access-token-placeholder": "your access token",
+  "mcp.dialog.generate.error": "Failed to generate access token",
+  "mcp.dialog.title": "Generate MCP access token",
+  "mcp.dialog.description": "Please keep your access token safe. The full token cannot be viewed again after generation.",
+  "mcp.dialog.status.generating": "Generating access token...",
+  "mcp.dialog.status.error": "Failed to generate access token",
 
   "bukkit-config.title": "Bukkit Configurations",
   "bukkit-config.description": "Edit the Bukkit configuration files",

@@ -1,10 +1,10 @@
 "use client";
 
 import type { ConsoleLogLevel } from "@/lib/ws/terminal";
+import type { PropsWithChildren } from "react";
 import { Settings as SettingsIcon } from "lucide-react";
 import { changeSettings, getSettings, resetSettings, type SettingsStorageType } from "@/lib/settings";
 import { SubPage } from "../sub-page";
-import { Section } from "./section";
 import {
   Select,
   SelectContent,
@@ -23,6 +23,20 @@ import { AvatarProvider, CapeProvider, SkinProvider } from "@/lib/types";
 import { type LanguageCode, languages } from "@/lang";
 import { $ } from "@/lib/i18n";
 import { sendDeleteRequest } from "@/lib/api";
+
+function Section({
+  title,
+  children
+}: PropsWithChildren<{
+  title: string
+}>) {
+  return (
+    <section>
+      <h2 className="text-lg font-semibold mb-3">{title}</h2>
+      <div className="bg-background dark:bg-transparent border rounded-md flex flex-col">{children}</div>
+    </section>
+  );
+}
 
 function SettingsItem<K extends keyof SettingsStorageType>({
   name,

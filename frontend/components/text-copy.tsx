@@ -1,0 +1,29 @@
+import { cn, copyToClipboard } from "@/lib/utils";
+import { $ } from "@/lib/i18n";
+import { Input } from "./ui/input";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+
+export function TextCopy({
+  text,
+  className,
+  ...props
+}: React.ComponentProps<typeof Input> & {
+  text: string
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        className={cn("cursor-pointer", className)}
+        onClick={() => copyToClipboard(text)}>
+        <Input
+          className="disabled:opacity-100"
+          value={text}
+          disabled
+          {...props}/>
+      </TooltipTrigger>
+      <TooltipContent>
+        {$("text-copy.copy")}
+      </TooltipContent>
+    </Tooltip>
+  );
+}

@@ -85,23 +85,24 @@ public class WebServer {
         VersionController versionController = new VersionController(plugin);
         WhitelistController whitelistController = new WhitelistController(plugin);
         TasksController tasksController = new TasksController(plugin);
+        McpController mcpController = new McpController(plugin);
 
         // API Routes
         app.before("/*", beforeController.beforeAll);
         app.before("/*", beforeController.handleRsc);
         app.before("/*", beforeController.handleFonts);
         app.routes(() -> path("assets", () -> {
-            before("/upload/*", beforeController.authCookie);
+            before("/upload/*", beforeController.authToken);
             get("/{name}", assetsController.getAsset);
             post("/upload/{name}", assetsController.uploadAsset);
             delete("/reset/{name}", assetsController.resetAsset);
         }));
         app.routes(() -> path("file", () -> {
-            before("/*", beforeController.authCookie);
+            before("/*", beforeController.authToken);
             get("/{id}/{fileName}", downloadController.downloadFile);
         }));
         app.routes(() -> path("api", () -> {
-            before("/*", beforeController.authCookie);
+            before("/*", beforeController.authToken);
 
             path("auth", () -> {
                 get("/", authController.getCram);
@@ -190,6 +191,12 @@ public class WebServer {
                 post("/{id}", tasksController.editTask);
                 patch("/{id}", tasksController.toggleTask);
                 delete("/{id}", tasksController.deleteTask);
+            });
+            path("mcp", () -> {
+                get("/", mcpController.getMcpEnabled);
+                post("/", mcpController.toggleMcp);
+                get("/token", mcpController.getMaskedAccessToken);
+                post("/token", mcpController.generateAccessToken);
             });
         }));
 
