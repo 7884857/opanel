@@ -80,6 +80,10 @@ export default function MonacoEditor(props: EditorProps) {
   useEffect(() => {
     if(typeof window === "undefined") return;
 
+    document.fonts.ready.then(() => {
+      monaco.editor.remeasureFonts();
+    });
+
     (window as any).MonacoEnvironment = {
       getWorker: (_workerId: never, label: string) => {
         switch(label) {
