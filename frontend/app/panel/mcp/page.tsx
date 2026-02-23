@@ -121,7 +121,12 @@ export default function MCPConfiguration() {
           name={$("mcp.item.enabled")}
           description={$("mcp.item.enabled.description")}>
           <Switch
-            disabled={process.env.NODE_ENV !== "development" && window.location.protocol !== "https:"}
+            disabled={
+              process.env.NODE_ENV !== "development"
+              && window.location.protocol !== "https:"
+              && window.location.hostname !== "localhost"
+              && !window.location.hostname.startsWith("192.168.")
+            }
             checked={enabled}
             onCheckedChange={(enabled) => handleToggleMcp(enabled)}/>
         </ConfigItem>
