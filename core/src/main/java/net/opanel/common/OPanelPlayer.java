@@ -1,6 +1,10 @@
 package net.opanel.common;
 
+import net.opanel.utils.Utils;
+
 import java.net.InetAddress;
+import java.util.HashMap;
+import java.util.List;
 
 public interface OPanelPlayer {
     String getName();
@@ -19,4 +23,23 @@ public interface OPanelPlayer {
     void pardon();
     int getPing();
     InetAddress getAddress();
+
+    default HashMap<String, Object> serialize(boolean isWhitelistEnabled, List<String> whitelistedNames, Long joinTime) {
+        HashMap<String, Object> playerInfo = new HashMap<>();
+        playerInfo.put("name", getName());
+        playerInfo.put("uuid", getUUID());
+        playerInfo.put("isOnline", isOnline());
+        playerInfo.put("isOp", isOp());
+        playerInfo.put("isBanned", isBanned());
+        playerInfo.put("gamemode", getGameMode().getName());
+        final String banReason = getBanReason();
+        if(banReason != null) playerInfo.put("banReason", Utils.stringToBase64(banReason));
+        if(isWhitelistEnabled) playerInfo.put("isWhitelisted", whitelistedNames.contains(getName()));
+        if(isOnline()) {
+            playerInfo.put("ping", getPing());
+            playerInfo.put("ip", getAddress().getHostAddress());
+            playerInfo.put("joinTime", joinTime);
+        }
+        return playerInfo;
+    }
 }

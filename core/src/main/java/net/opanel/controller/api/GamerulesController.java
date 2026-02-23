@@ -29,6 +29,28 @@ public class GamerulesController extends BaseController {
         sendResponse(ctx, HttpStatus.OK);
     };
 
+    public Handler patchGamerule = ctx -> { // for mcp
+        final String key = ctx.queryParam("key");
+        final String value = ctx.queryParam("value");
+        if(key == null) {
+            sendResponse(ctx, HttpStatus.BAD_REQUEST, "Key is missing.");
+            return;
+        }
+        if(value == null) {
+            sendResponse(ctx, HttpStatus.BAD_REQUEST, "Value is missing.");
+            return;
+        }
+
+        HashMap<String, Object> gamerules = server.getGamerules();
+        if(!gamerules.containsKey(key)) {
+            sendResponse(ctx, HttpStatus.NOT_FOUND, "Cannot find the specified gamerule.");
+            return;
+        }
+        gamerules.put(key, value);
+        server.setGamerules(gamerules);
+        sendResponse(ctx, HttpStatus.OK);
+    };
+
     private static class GamerulesEditRequestBodyType {
         HashMap<String, Object> gamerules;
     }

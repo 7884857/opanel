@@ -38,7 +38,7 @@ public class PlayersEndpoint extends BaseEndpoint {
                 joinTimeMap.put(event.getPlayer().getUUID(), joinTime);
 
                 List<String> whitelistedNames = server.getWhitelist().getNames();
-                broadcast(new PlayersPacket<>(PlayersPacket.JOIN, serializePlayer(event.getPlayer(), whitelistedNames, joinTime)));
+                broadcast(new PlayersPacket<>(PlayersPacket.JOIN, event.getPlayer().serialize(server.isWhitelistEnabled(), whitelistedNames, joinTime)));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -49,7 +49,7 @@ public class PlayersEndpoint extends BaseEndpoint {
                 joinTimeMap.remove(event.getPlayer().getUUID());
 
                 List<String> whitelistedNames = server.getWhitelist().getNames();
-                HashMap<String, Object> playerInfo = serializePlayer(event.getPlayer(), whitelistedNames, null);
+                HashMap<String, Object> playerInfo = event.getPlayer().serialize(server.isWhitelistEnabled(), whitelistedNames, null);
                 playerInfo.put("isOnline", false);
                 broadcast(new PlayersPacket<>(PlayersPacket.LEAVE, playerInfo));
             } catch (IOException e) {
@@ -60,7 +60,7 @@ public class PlayersEndpoint extends BaseEndpoint {
         EventManager.get().on(EventType.PLAYER_GAMEMODE_CHANGE, (OPanelPlayerGameModeChangeEvent event) -> {
             try {
                 List<String> whitelistedNames = server.getWhitelist().getNames();
-                HashMap<String, Object> playerInfo = serializePlayer(event.getPlayer(), whitelistedNames, null);
+                HashMap<String, Object> playerInfo = event.getPlayer().serialize(server.isWhitelistEnabled(), whitelistedNames, null);
                 playerInfo.put("gamemode", event.getGameMode().getName());
                 broadcast(new PlayersPacket<>(PlayersPacket.GAMEMODE_CHANGE, playerInfo));
             } catch (IOException e) {
@@ -81,7 +81,7 @@ public class PlayersEndpoint extends BaseEndpoint {
             List<String> whitelistedNames = server.getWhitelist().getNames();
             List<HashMap<String, Object>> players = server.getPlayers().stream()
                     .map(player -> (
-                            serializePlayer(player, whitelistedNames, player.isOnline() ? joinTimeMap.get(player.getUUID()) : null)
+                            player.serialize(server.isWhitelistEnabled(), whitelistedNames, player.isOnline() ? joinTimeMap.get(player.getUUID()) : null)
                     ))
                     .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
 
@@ -89,24 +89,5 @@ public class PlayersEndpoint extends BaseEndpoint {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private HashMap<String, Object> serializePlayer(OPanelPlayer player, List<String> whitelistedNames, Long joinTime) {
-        HashMap<String, Object> playerInfo = new HashMap<>();
-        playerInfo.put("name", player.getName());
-        playerInfo.put("uuid", player.getUUID());
-        playerInfo.put("isOnline", player.isOnline());
-        playerInfo.put("isOp", player.isOp());
-        playerInfo.put("isBanned", player.isBanned());
-        playerInfo.put("gamemode", player.getGameMode().getName());
-        final String banReason = player.getBanReason();
-        if(banReason != null) playerInfo.put("banReason", Utils.stringToBase64(banReason));
-        if(server.isWhitelistEnabled()) playerInfo.put("isWhitelisted", whitelistedNames.contains(player.getName()));
-        if(player.isOnline()) {
-            playerInfo.put("ping", player.getPing());
-            playerInfo.put("ip", player.getAddress().getHostAddress());
-            playerInfo.put("joinTime", joinTime);
-        }
-        return playerInfo;
     }
 }

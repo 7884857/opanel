@@ -81,6 +81,7 @@ public class WebServer {
         PlayersController playersController = new PlayersController(plugin);
         SavesController savesController = new SavesController(plugin);
         PluginsController pluginsController = new PluginsController(plugin);
+        TerminalController terminalController = new TerminalController(plugin);
         SecurityController securityController = new SecurityController(plugin);
         VersionController versionController = new VersionController(plugin);
         WhitelistController whitelistController = new WhitelistController(plugin);
@@ -132,6 +133,7 @@ public class WebServer {
             path("gamerules", () -> {
                 get("/", gamerulesController.getGamerules);
                 post("/", gamerulesController.changeGamerule);
+                patch("/", gamerulesController.patchGamerule); // for mcp
             });
             path("icon", () -> {
                 get("/", iconController.getFavicon);
@@ -150,7 +152,8 @@ public class WebServer {
             });
             get("monitor", monitorController.getMonitor);
             path("players", () -> {
-                get("/", playersController.getPlayers);
+                get("/", playersController.getPlayersOverview);
+                get("list", playersController.getPlayers); // for mcp
                 delete("/", playersController.deletePlayerData);
                 post("op", playersController.giveOp);
                 post("deop", playersController.depriveOp);
@@ -174,6 +177,10 @@ public class WebServer {
                 get("{fileName}", pluginsController.downloadPlugin);
                 post("{fileName}", pluginsController.togglePlugin);
                 delete("{fileName}", pluginsController.deletePlugin);
+            });
+            path("terminal", () -> {
+                get("/", terminalController.getCommands); // for mcp
+                post("/", terminalController.sendCommand); // for mcp
             });
             post("security", securityController.updateAccessKey);
             get("version", versionController.getVersionInfo);
