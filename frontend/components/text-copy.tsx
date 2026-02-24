@@ -16,9 +16,8 @@ export function TextCopy({
         className={cn("cursor-pointer", className)}
         onClick={() => copyToClipboard(text)}>
         <Input
-          className="disabled:opacity-100"
           value={text}
-          disabled
+          readOnly
           {...props}/>
       </TooltipTrigger>
       <TooltipContent>
