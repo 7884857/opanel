@@ -125,6 +125,11 @@ export enum CapeProvider {
   CRAFATAR = "https://avatars.cloudhaven.gg/capes/"
 }
 
+export interface CommandShortcut {
+  name: string
+  command: string
+}
+
 /** `/api/version` */
 export interface VersionResponse {
   serverType: ServerType

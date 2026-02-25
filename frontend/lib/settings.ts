@@ -4,6 +4,7 @@ import type { ConfigFile } from "@/app/panel/bukkit-config/page";
 import {
   AvatarProvider,
   CapeProvider,
+  type CommandShortcut,
   SkinProvider,
   type EditorOptionsType
 } from "./types";
@@ -33,6 +34,7 @@ export type SettingsStorageType = {
   "terminal.thread-name": boolean
   "terminal.source-name": boolean
   "terminal.rich-style": boolean
+  "terminal.shortcuts": CommandShortcut[]
   "code-of-conduct.auto-saving-interval": number
   "monaco.word-wrap": boolean
   "monaco.font-size": number
@@ -63,6 +65,14 @@ const defaultSettings: SettingsStorageType = {
   "terminal.thread-name": true,
   "terminal.source-name": true,
   "terminal.rich-style": true,
+  "terminal.shortcuts": [
+    { name: "设为白天", command: "time set day" },
+    { name: "设为正午", command: "time set noon" },
+    { name: "设为晚上", command: "time set night" },
+    { name: "和平模式", command: "difficulty peaceful" },
+    { name: "简单模式", command: "difficulty easy" },
+    { name: "困难模式", command: "difficulty hard" },
+  ],
   "code-of-conduct.auto-saving-interval": 2000, // ms
   "monaco.word-wrap": false,
   "monaco.font-size": 13, // px

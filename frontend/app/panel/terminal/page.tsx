@@ -1,5 +1,6 @@
 "use client";
 
+import type { CommandShortcut } from "@/lib/types";
 import {
   type KeyboardEvent,
   useCallback,
@@ -7,7 +8,7 @@ import {
   useRef,
   useState
 } from "react";
-import { ArrowUp, Maximize, Minimize, SquareTerminal, Trash2 } from "lucide-react";
+import { ArrowUp, Maximize, Minimize, Pen, Plus, SquareTerminal, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useWebSocket } from "@/hooks/use-websocket";
 import { TerminalViewer } from "@/components/terminal-viewer";
@@ -27,6 +28,8 @@ import { changeSettings, getSettings } from "@/lib/settings";
 import { googleSansCode } from "@/lib/fonts";
 import { $ } from "@/lib/i18n";
 import { type ConsoleLogLevel, defaultLogLevel, TerminalClient } from "@/lib/ws/terminal";
+import { Toggle } from "@/components/ui/toggle";
+import { CreateShortcutDialog } from "./create-shortcut-dialog";
 
 export default function Terminal() {
   const client = useWebSocket(TerminalClient);
@@ -37,6 +40,8 @@ export default function Terminal() {
   const [historyList, setHistoryList] = useState<string[]>(getSettings("state.terminal.history"));
   const [logLevel, setLogLevel] = useState(defaultLogLevel);
   const [fullscreen, setFullscreen] = useState(false);
+  const [shortcuts, setShortcuts] = useState<CommandShortcut[]>(getSettings("terminal.shortcuts"));
+  const [editingShortcuts, setEditingShortcuts] = useState(false);
 
   const handleSend = useCallback(() => {
     if(!inputRef.current || !client) return;
@@ -99,8 +104,26 @@ export default function Terminal() {
     inputRef.current?.focus();
   };
 
-  const handleFullscreenChange = (e: Event) => {
+  const handleFullscreenChange = () => {
     setFullscreen(!!document.fullscreenElement);
+  };
+
+  const handleShortcutAction = (shortcut: CommandShortcut) => {
+    if(!client) return;
+
+    client.send("command", shortcut.command);
+    setHistoryList((current) => [...current, shortcut.command]);
+  };
+
+  const handleRemoveShortcut = (index: number) => {
+    const original = getSettings("terminal.shortcuts");
+    if(index < 0 || index >= original.length) return;
+
+    const newShortcuts = [];
+    for(let i = 0; i < original.length; i++) {
+      if(i !== index) newShortcuts.push(original[i]);
+    }
+    setShortcuts(newShortcuts);
   };
 
   useEffect(() => {
@@ -112,6 +135,10 @@ export default function Terminal() {
   useEffect(() => {
     changeSettings("state.terminal.history", historyList);
   }, [historyList]);
+
+  useEffect(() => {
+    changeSettings("terminal.shortcuts", shortcuts);
+  }, [shortcuts]);
 
   useEffect(() => {
     document.addEventListener("fullscreenchange", handleFullscreenChange);
@@ -126,49 +153,91 @@ export default function Terminal() {
       icon={<SquareTerminal />}
       outerClassName="max-h-screen overflow-y-hidden"
       className="flex-1 min-h-0 flex gap-3">
-      <div
-        className="bg-background flex-4/5 max-lg:flex-3/4 max-md:flex-2/3 min-w-0 flex flex-col border rounded-sm"
-        ref={terminalContainerRef}>
-        <TerminalViewer client={client} level={logLevel} className="flex-1 border-none"/>
-        <div className="p-3 flex gap-2">
-          <Select
-            defaultValue={defaultLogLevel}
-            onValueChange={(value) => setLogLevel(value as ConsoleLogLevel)}>
-            <SelectTrigger className={cn("w-24 max-sm:w-20", googleSansCode.className)} title="日志等级">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className={googleSansCode.className}>
-              <SelectItem value="INFO">INFO</SelectItem>
-              <SelectItem value="WARN">WARN</SelectItem>
-              <SelectItem value="ERROR">ERROR</SelectItem>
-            </SelectContent>
-          </Select>
-          <AutocompleteInput
-            className={cn("flex-1 w-full rounded-sm", googleSansCode.className)}
-            placeholder={$("terminal.input.placeholder")}
-            autoFocus
-            itemList={autocompleteList}
-            enabled={getSettings("terminal.autocomplete")}
-            prefix="/"
-            maxLength={256}
-            onKeyDown={(e) => handleKeydown(e)}
-            onInput={() => handleInput()}
-            ref={inputRef}/>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="cursor-pointer"
-            title={fullscreen ? $("terminal.exit-fullscreen") : $("terminal.fullscreen")}
-            onClick={() => handleFullscreen()}>
-            {fullscreen ? <Minimize /> : <Maximize />}
-          </Button>
-          <Button
-            size="icon"
-            className="cursor-pointer"
-            title={$("terminal.send")}
-            onClick={() => handleSend()}>
-            <ArrowUp />
-          </Button>
+      <div className="flex-4/5 max-lg:flex-3/4 max-md:flex-2/3 min-w-0 flex flex-col gap-2">
+        <div className={cn("px-2 flex flex-wrap items-center gap-1 transition-[gap]", editingShortcuts && "gap-3")}>
+          {shortcuts.map((shortcut, i) => (
+            <div
+              className="relative *:cursor-pointer"
+              key={i}>
+              <Button
+                variant="outline"
+                size="xs"
+                disabled={editingShortcuts}
+                onClick={() => handleShortcutAction(shortcut)}>
+                {shortcut.name}
+              </Button>
+              {editingShortcuts && (
+                <button
+                  className="absolute -top-1 -left-2 rounded-full bg-accent p-0.5 z-10"
+                  onClick={() => handleRemoveShortcut(i)}>
+                  <X size={13}/>
+                </button>
+              )}
+            </div>
+          ))}
+          <div className="flex *:cursor-pointer">
+            <CreateShortcutDialog
+              onCreate={(shortcut) => setShortcuts((current) => [...current, shortcut])}
+              asChild>
+              <Button
+                variant="ghost"
+                size="icon-xs">
+                <Plus />
+              </Button>
+            </CreateShortcutDialog>
+            <Toggle
+              variant="ghost"
+              size="icon-xs"
+              className="data-[state=on]:*:fill-foreground"
+              onPressedChange={(pressed) => setEditingShortcuts(pressed)}>
+              <Pen />
+            </Toggle>
+          </div>
+        </div>
+        <div
+          className="bg-background flex-1 flex flex-col border rounded-sm"
+          ref={terminalContainerRef}>
+          <TerminalViewer client={client} level={logLevel} className="flex-1 border-none"/>
+          <div className="p-3 flex gap-2">
+            <Select
+              defaultValue={defaultLogLevel}
+              onValueChange={(value) => setLogLevel(value as ConsoleLogLevel)}>
+              <SelectTrigger className={cn("w-24 max-sm:w-20", googleSansCode.className)} title="日志等级">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className={googleSansCode.className}>
+                <SelectItem value="INFO">INFO</SelectItem>
+                <SelectItem value="WARN">WARN</SelectItem>
+                <SelectItem value="ERROR">ERROR</SelectItem>
+              </SelectContent>
+            </Select>
+            <AutocompleteInput
+              className={cn("flex-1 w-full rounded-sm", googleSansCode.className)}
+              placeholder={$("terminal.input.placeholder")}
+              autoFocus
+              itemList={autocompleteList}
+              enabled={getSettings("terminal.autocomplete")}
+              prefix="/"
+              maxLength={256}
+              onKeyDown={(e) => handleKeydown(e)}
+              onInput={() => handleInput()}
+              ref={inputRef}/>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="cursor-pointer"
+              title={fullscreen ? $("terminal.exit-fullscreen") : $("terminal.fullscreen")}
+              onClick={() => handleFullscreen()}>
+              {fullscreen ? <Minimize /> : <Maximize />}
+            </Button>
+            <Button
+              size="icon"
+              className="cursor-pointer"
+              title={$("terminal.send")}
+              onClick={() => handleSend()}>
+              <ArrowUp />
+            </Button>
+          </div>
         </div>
       </div>
       <div className="flex-1/5 max-lg:flex-1/4 max-md:flex-1/3 min-w-0 flex flex-col gap-2 max-lg:hidden">
