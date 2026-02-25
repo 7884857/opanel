@@ -5,7 +5,7 @@ import { SquareTerminal } from "lucide-react";
 import { FunctionalCard } from "@/components/functional-card";
 import { Input } from "@/components/ui/input";
 import { useWebSocket } from "@/hooks/use-websocket";
-import { TerminalConnector } from "@/components/terminal-connector";
+import { TerminalViewer } from "@/components/terminal-viewer";
 import { $ } from "@/lib/i18n";
 import { TerminalClient } from "@/lib/ws/terminal";
 
@@ -24,7 +24,7 @@ export function TerminalCard({
       moreLink="/panel/terminal"
       className={className}
       innerClassName="p-2 pt-0 h-full max-xl:h-96 flex flex-col gap-2 overflow-hidden">
-      <TerminalConnector client={client} simple className="flex-1"/>
+      <TerminalViewer client={client} simple className="flex-1"/>
       <Input
         className="w-full rounded-sm cursor-pointer"
         placeholder={$("dashboard.terminal.input.placeholder")}
