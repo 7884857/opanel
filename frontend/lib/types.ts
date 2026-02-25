@@ -147,7 +147,7 @@ export interface InfoResponse {
   }
   system: {
     os: string
-    arch: number
+    arch: string
     cpuName: string
     cpuCore: number
     memory: number

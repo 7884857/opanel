@@ -19,10 +19,23 @@ public class PlayersController extends BaseController {
         super(plugin);
     }
 
-    public Handler getPlayers = ctx -> {
+    public Handler getPlayersOverview = ctx -> {
         HashMap<String, Object> obj = new HashMap<>();
         obj.put("maxPlayerCount", server.getMaxPlayerCount());
         obj.put("whitelist", server.isWhitelistEnabled());
+        sendResponse(ctx, obj);
+    };
+
+    public Handler getPlayers = ctx -> { // for mcp
+        List<String> whitelistedNames = server.getWhitelist().getNames();
+
+        HashMap<String, Object> obj = new HashMap<>();
+        List<HashMap<String, Object>> players = server.getPlayers().stream()
+                .map(player -> (
+                        player.serialize(server.isWhitelistEnabled(), whitelistedNames, null)
+                ))
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+        obj.put("players", players);
         sendResponse(ctx, obj);
     };
 

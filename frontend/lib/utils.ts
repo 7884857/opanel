@@ -3,6 +3,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import locale from "locale-codes";
 import { NbtObject, NbtString } from "snbt-js";
+import { toast } from "sonner";
 import { $ } from "./i18n";
 
 export function cn(...inputs: ClassValue[]) {
@@ -169,4 +170,13 @@ export function textComponentToString(component: NbtString | NbtObject): string 
     return component.get<NbtString>("text")?.value ?? null;
   }
   return null;
+}
+
+export async function copyToClipboard(text: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast.success($("common.copy.success"));
+  } catch (e) {
+    toast.error($("common.copy.error"));
+  }
 }

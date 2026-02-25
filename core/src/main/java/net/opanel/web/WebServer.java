@@ -81,27 +81,29 @@ public class WebServer {
         PlayersController playersController = new PlayersController(plugin);
         SavesController savesController = new SavesController(plugin);
         PluginsController pluginsController = new PluginsController(plugin);
+        TerminalController terminalController = new TerminalController(plugin);
         SecurityController securityController = new SecurityController(plugin);
         VersionController versionController = new VersionController(plugin);
         WhitelistController whitelistController = new WhitelistController(plugin);
         TasksController tasksController = new TasksController(plugin);
+        McpController mcpController = new McpController(plugin);
 
         // API Routes
         app.before("/*", beforeController.beforeAll);
         app.before("/*", beforeController.handleRsc);
         app.before("/*", beforeController.handleFonts);
         app.routes(() -> path("assets", () -> {
-            before("/upload/*", beforeController.authCookie);
+            before("/upload/*", beforeController.authToken);
             get("/{name}", assetsController.getAsset);
             post("/upload/{name}", assetsController.uploadAsset);
             delete("/reset/{name}", assetsController.resetAsset);
         }));
         app.routes(() -> path("file", () -> {
-            before("/*", beforeController.authCookie);
+            before("/*", beforeController.authToken);
             get("/{id}/{fileName}", downloadController.downloadFile);
         }));
         app.routes(() -> path("api", () -> {
-            before("/*", beforeController.authCookie);
+            before("/*", beforeController.authToken);
 
             path("auth", () -> {
                 get("/", authController.getCram);
@@ -131,6 +133,7 @@ public class WebServer {
             path("gamerules", () -> {
                 get("/", gamerulesController.getGamerules);
                 post("/", gamerulesController.changeGamerule);
+                patch("/", gamerulesController.patchGamerule); // for mcp
             });
             path("icon", () -> {
                 get("/", iconController.getFavicon);
@@ -149,7 +152,8 @@ public class WebServer {
             });
             get("monitor", monitorController.getMonitor);
             path("players", () -> {
-                get("/", playersController.getPlayers);
+                get("/", playersController.getPlayersOverview);
+                get("list", playersController.getPlayers); // for mcp
                 delete("/", playersController.deletePlayerData);
                 post("op", playersController.giveOp);
                 post("deop", playersController.depriveOp);
@@ -174,6 +178,10 @@ public class WebServer {
                 post("{fileName}", pluginsController.togglePlugin);
                 delete("{fileName}", pluginsController.deletePlugin);
             });
+            path("terminal", () -> {
+                get("/", terminalController.getCommands); // for mcp
+                post("/", terminalController.sendCommand); // for mcp
+            });
             post("security", securityController.updateAccessKey);
             get("version", versionController.getVersionInfo);
             path("whitelist", () -> {
@@ -190,6 +198,12 @@ public class WebServer {
                 post("/{id}", tasksController.editTask);
                 patch("/{id}", tasksController.toggleTask);
                 delete("/{id}", tasksController.deleteTask);
+            });
+            path("mcp", () -> {
+                get("/", mcpController.getMcpEnabled);
+                post("/", mcpController.toggleMcp);
+                get("/token", mcpController.getMaskedAccessToken);
+                post("/token", mcpController.generateAccessToken);
             });
         }));
 
