@@ -2,7 +2,7 @@ package net.opanel.storage;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import net.opanel.controller.api.McpController;
+import net.opanel.config.McpConfiguration;
 import net.opanel.task.ScheduledTask;
 
 import java.io.IOException;
@@ -24,8 +24,8 @@ public class Storage {
         ));
         registeredStorageFiles.put(StorageKey.MCP_CONFIG, new StorageFile<>(
                 "mcp-config.json",
-                McpController.McpConfiguration.class,
-                new McpController.McpConfiguration(false)
+                McpConfiguration.class,
+                new McpConfiguration(false)
         ));
     }
 

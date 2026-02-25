@@ -178,6 +178,5 @@ export async function copyToClipboard(text: string) {
     toast.success($("common.copy.success"));
   } catch (e) {
     toast.error($("common.copy.error"));
-    throw e;
   }
 }

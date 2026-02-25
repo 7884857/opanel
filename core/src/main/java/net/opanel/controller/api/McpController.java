@@ -3,6 +3,7 @@ package net.opanel.controller.api;
 import io.javalin.http.Handler;
 import io.javalin.http.HttpStatus;
 import net.opanel.OPanel;
+import net.opanel.config.McpConfiguration;
 import net.opanel.controller.BaseController;
 import net.opanel.storage.Storage;
 import net.opanel.storage.StorageKey;
@@ -70,13 +71,4 @@ public class McpController extends BaseController {
         obj.put("maskedAccessToken", masked);
         sendResponse(ctx, obj);
     };
-
-    public static class McpConfiguration {
-        public boolean enabled;
-        public String accessToken;
-
-        public McpConfiguration(boolean enabled) {
-            this.enabled = enabled;
-        }
-    }
 }

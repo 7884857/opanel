@@ -3,7 +3,7 @@ package net.opanel.controller;
 import io.javalin.http.*;
 import io.javalin.http.servlet.JavalinServletContext;
 import net.opanel.OPanel;
-import net.opanel.controller.api.McpController;
+import net.opanel.config.McpConfiguration;
 import net.opanel.storage.Storage;
 import net.opanel.storage.StorageKey;
 import net.opanel.web.JwtManager;
@@ -23,13 +23,7 @@ public class BeforeController extends BaseController {
         if(ctx.path().startsWith("/api/auth") || ctx.path().equals("/api/icon") || ctx.method() == HandlerType.OPTIONS) return;
 
         String authorization = ctx.header("Authorization");
-        if(authorization != null && !ctx.path().startsWith("/api/security")) { // auth mcp access token
-            if(!authorization.startsWith("Bearer ")) {
-                sendResponse(ctx, HttpStatus.BAD_REQUEST, "Authorization header is invalid.");
-                clearContextTasks(ctx);
-                return;
-            }
-
+        if(authorization != null && authorization.startsWith("Bearer ") && !ctx.path().startsWith("/api/security")) { // auth mcp access token
             String accessToken = authorization.substring(7);
             if(!accessToken.startsWith("o-") || accessToken.length() != 50) {
                 sendResponse(ctx, HttpStatus.BAD_REQUEST, "Authorization header is invalid.");
@@ -37,7 +31,7 @@ public class BeforeController extends BaseController {
                 return;
             }
 
-            McpController.McpConfiguration mcpConfig = Storage.get().getStoredData(StorageKey.MCP_CONFIG);
+            McpConfiguration mcpConfig = Storage.get().getStoredData(StorageKey.MCP_CONFIG);
             if(mcpConfig == null || !mcpConfig.enabled) {
                 sendResponse(ctx, HttpStatus.SERVICE_UNAVAILABLE, "Mcp is not enabled.");
                 clearContextTasks(ctx);
