@@ -10,7 +10,7 @@ import {
 import { ArrowUp, Maximize, Minimize, SquareTerminal, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useWebSocket } from "@/hooks/use-websocket";
-import { TerminalConnector } from "@/components/terminal-connector";
+import { TerminalViewer } from "@/components/terminal-viewer";
 import { Button } from "@/components/ui/button";
 import { AutocompleteInput } from "@/components/autocomplete-input";
 import { cn, getCurrentArgumentIndex } from "@/lib/utils";
@@ -129,7 +129,7 @@ export default function Terminal() {
       <div
         className="bg-background flex-4/5 max-lg:flex-3/4 max-md:flex-2/3 min-w-0 flex flex-col border rounded-sm"
         ref={terminalContainerRef}>
-        <TerminalConnector client={client} level={logLevel} className="flex-1 border-none"/>
+        <TerminalViewer client={client} level={logLevel} className="flex-1 border-none"/>
         <div className="p-3 flex gap-2">
           <Select
             defaultValue={defaultLogLevel}

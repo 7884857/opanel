@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { format } from "date-format-parse";
 import AnsiConverter from "ansi-to-html";
-import { cn, purifyUnsafeText } from "@/lib/utils";
+import { cn, getCurrentState, purifyUnsafeText } from "@/lib/utils";
 import { getSettings } from "@/lib/settings";
 import { googleSansCode } from "@/lib/fonts";
 import {
@@ -14,6 +14,7 @@ import {
 import { parseTextToANSI, secSign } from "@/lib/formatting-codes/text";
 
 const MAX_LOG_LINES = getSettings("terminal.max-log-lines");
+const STOP_SCROLLING_TIME = 5000;
 
 /** @see https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url */
 const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:;%_\+.~#?&//=]*)/g;
@@ -85,7 +86,7 @@ function Log({
   );
 }
 
-export function TerminalConnector({
+export function TerminalViewer({
   client,
   simple,
   level,
@@ -98,11 +99,24 @@ export function TerminalConnector({
 }) {
   const terminalRef = useRef<HTMLDivElement>(null);
   const [logs, setLogs] = useState<ConsoleLog[]>([]);
+  const [, setScrolling] = useState(false);
+  const scrollingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const pushLog = (log: ConsoleLog) => {
     setLogs((current) => {
       if(current.length + 1 > MAX_LOG_LINES) current.shift();
       log.line = purifyUnsafeText(log.line);
+
+      if(terminalRef.current) {
+        const elem = terminalRef.current;
+        if(elem.scrollTop + elem.clientHeight >= elem.scrollHeight - 20) {
+          if(scrollingTimerRef.current) {
+            clearTimeout(scrollingTimerRef.current);
+            scrollingTimerRef.current = null;
+          }
+          setScrolling(false);
+        }
+      }
       return [...current, log];
     });
   };
@@ -113,12 +127,52 @@ export function TerminalConnector({
     terminalRef.current.innerHTML = "";
   };
 
+  const handleScroll = useCallback(() => {
+    if(!terminalRef.current) return;
+
+    const elem = terminalRef.current;
+    setScrolling(() => {
+      const scrolling = elem.scrollTop + elem.clientHeight < elem.scrollHeight - 20;
+      if(scrolling && scrollingTimerRef.current) {
+        clearTimeout(scrollingTimerRef.current);
+        scrollingTimerRef.current = null;
+      }
+      return scrolling;
+    });
+    
+    if(!scrollingTimerRef.current) {
+      scrollingTimerRef.current = setTimeout(() => {
+        setScrolling(false);
+        scrollingTimerRef.current = null;
+      }, STOP_SCROLLING_TIME);
+    }
+  }, []);
+
   useEffect(() => {
     if(!terminalRef.current) return;
 
     const elem = terminalRef.current;
-    elem.scrollTo({ top: elem.scrollHeight });
+    getCurrentState(setScrolling).then((scrolling) => {
+      if(!scrolling) {
+        elem.scrollTo({ top: elem.scrollHeight });
+      }
+    });
   }, [logs]);
+
+  useEffect(() => {
+    if(!terminalRef.current) return;
+
+    const elem = terminalRef.current;
+    elem.addEventListener("scroll", handleScroll);
+
+    return () => {
+      if(scrollingTimerRef.current) {
+        clearTimeout(scrollingTimerRef.current);
+        scrollingTimerRef.current = null;
+      }
+      elem.removeEventListener("scroll", handleScroll);
+    };
+  }, [handleScroll]);
 
   useEffect(() => {
     if(!client) return;
