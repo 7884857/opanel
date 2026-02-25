@@ -2,6 +2,7 @@
 
 import type { ConsoleLogLevel } from "@/lib/ws/terminal";
 import type { PropsWithChildren } from "react";
+import Link from "next/link";
 import { Settings as SettingsIcon } from "lucide-react";
 import { changeSettings, getSettings, resetSettings, type SettingsStorageType } from "@/lib/settings";
 import { SubPage } from "../sub-page";
@@ -238,6 +239,18 @@ export default function Settings() {
                   ))}
                 </SelectContent>
               </Select>
+            }/>
+          <SettingsItem
+            id="system.mcp"
+            name={$("settings.system.mcp")}
+            description={$("settings.system.mcp.description")}
+            control={
+              <Button
+                className="cursor-pointer"
+                size="sm"
+                asChild>
+                <Link href="/panel/mcp">{$("settings.system.mcp.configure")}</Link>
+              </Button>
             }/>
           <SettingsItem
             id="system.access-key"

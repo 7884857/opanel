@@ -39,6 +39,7 @@ export type SettingsStorageType = {
   "appearance.login-banner"?: never
   "system.language": LanguageCode
   "system.preview-channel": boolean
+  "system.mcp"?: never
   "system.access-key"?: never
   "system.check-update"?: never
   "state.players.tab": "player-list" | "banned-list"
