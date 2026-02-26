@@ -33,18 +33,23 @@ const serverGroupItems = [
     icon: Gauge
   },
   {
-    name: $("sidebar.server.saves"),
-    url: "/panel/saves",
-    icon: Earth
-  },
-  {
-    name: $("sidebar.server.players"),
-    url: "/panel/players",
-    icon: Users
+    name: $("sidebar.server.terminal"),
+    url: "/panel/terminal",
+    icon: SquareTerminal
   }
 ];
 
 const managementGroupItems = [
+  {
+    name: $("sidebar.management.saves"),
+    url: "/panel/saves",
+    icon: Earth
+  },
+  {
+    name: $("sidebar.management.players"),
+    url: "/panel/players",
+    icon: Users
+  },
   {
     name: $("sidebar.management.gamerules"),
     url: "/panel/gamerules",
@@ -54,11 +59,6 @@ const managementGroupItems = [
     name: $("sidebar.management.plugins"),
     url: "/panel/plugins",
     icon: Blocks
-  },
-  {
-    name: $("sidebar.management.terminal"),
-    url: "/panel/terminal",
-    icon: SquareTerminal
   },
   {
     name: $("sidebar.management.logs"),

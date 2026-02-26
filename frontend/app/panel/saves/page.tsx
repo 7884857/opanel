@@ -83,7 +83,7 @@ export default function Saves() {
     <SubPage
       title={$("saves.title")}
       description={$("saves.description")}
-      category={$("sidebar.server")}
+      category={$("sidebar.management")}
       icon={<Earth />}
       className="relative h-full z-20"
       onDragEnter={() => setUploadVisible(true)}>

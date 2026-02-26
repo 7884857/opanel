@@ -149,7 +149,7 @@ export default function Terminal() {
   return (
     <SubPage
       title={$("terminal.title")}
-      category={$("sidebar.management")}
+      category={$("sidebar.server")}
       icon={<SquareTerminal />}
       outerClassName="max-h-screen overflow-y-hidden"
       className="flex-1 min-h-0 flex gap-3">
