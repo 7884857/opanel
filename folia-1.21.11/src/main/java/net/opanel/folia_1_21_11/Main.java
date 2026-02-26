@@ -6,8 +6,10 @@ import net.opanel.OPanel;
 import net.opanel.bukkit_helper.TaskRunner;
 import net.opanel.bukkit_helper.command.OPanelCommand;
 import net.opanel.bukkit_helper.config.ConfigManagerImpl;
+import net.opanel.common.Constants;
 import net.opanel.folia_1_21_11.terminal.LogListenerManagerImpl;
 import org.apache.logging.log4j.LogManager;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -45,6 +47,9 @@ public class Main extends JavaPlugin implements Listener, TaskRunner {
         Bukkit.getPluginManager().registerEvents(new FoliaListener(this), this);
 
         getCommand("opanel").setExecutor(new OPanelCommand(instance));
+
+        // bStats
+        new Metrics(this, Constants.BSTATS_ID);
     }
 
     @Override

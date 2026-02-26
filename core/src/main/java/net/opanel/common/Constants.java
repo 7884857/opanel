@@ -3,6 +3,8 @@ package net.opanel.common;
 import net.opanel.OPanel;
 
 public class Constants {
+    public static final int BSTATS_ID = 29765;
+
     public static final String ABOUT_INFO = new StringBuilder()
             .append("§8===========================================\n")
             .append("§r §6§lOPanel§r - §fA Minecraft server management panel\n\n")
