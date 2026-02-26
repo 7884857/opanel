@@ -99,7 +99,7 @@ export default function Players() {
       title={$("players.title")}
       subTitle={currentTab === "player-list" ? $("players.player-list.title") : $("players.banned-list.title")}
       description={$("players.description")}
-      category={$("sidebar.server")}
+      category={$("sidebar.management")}
       icon={<Users />}
       className="flex flex-col gap-3">
       <span className="text-sm text-muted-foreground">{$("players.hint")}</span>
