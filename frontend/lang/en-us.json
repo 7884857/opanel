@@ -74,6 +74,7 @@
   "sidebar.config": "Configurations",
   "sidebar.config.tasks": "Scheduled Tasks",
   "sidebar.config.bukkit-config": "Bukkit Config",
+  "sidebar.config.open-api": "Open API",
 
   "nav.settings": "Settings",
   "nav.docs": "Docs",
@@ -495,6 +496,18 @@
   "mcp.dialog.description": "Please keep your access token safe. The full token cannot be viewed again after generation.",
   "mcp.dialog.status.generating": "Generating access token...",
   "mcp.dialog.status.error": "Failed to generate access token",
+
+  "open-api.title": "Open API",
+  "open-api.description": "Configure Open API to allow other applications or web pages to access server information",
+  "open-api.item.enabled": "Enable Open API",
+  "open-api.interfaces.title": "API Reference",
+  "open-api.interfaces.request": "Request Schema",
+  "open-api.interfaces.response": "Response Schema",
+  "open-api.interfaces.info.description": "Get the basic server information.",
+  "open-api.interfaces.monitor.description": "Get current CPU, memory, TPS, and other monitoring data of the server.",
+  "open-api.interfaces.plugins.description": "Get the list of currently installed plugins/mods.",
+  "open-api.interfaces.players.description": "Get the list of currently online players.",
+  "open-api.interfaces.player.description": "Get detailed information of a specific player.",
 
   "bukkit-config.title": "Bukkit Configurations",
   "bukkit-config.description": "Edit the Bukkit configuration files",

@@ -74,6 +74,7 @@
   "sidebar.config": "配置",
   "sidebar.config.tasks": "定時任務",
   "sidebar.config.bukkit-config": "Bukkit 配置",
+  "sidebar.config.open-api": "開放API",
 
   "nav.settings": "設定",
   "nav.docs": "文檔",
@@ -495,6 +496,18 @@
   "mcp.dialog.description": "請妥善保管你嘅訪問令牌，生成後將無法再次查看完整令牌內容。",
   "mcp.dialog.status.generating": "正在生成訪問令牌...",
   "mcp.dialog.status.error": "訪問令牌生成失敗",
+
+  "open-api.title": "開放API",
+  "open-api.description": "配置開放API以允許其他應用程式或網頁取得伺服器資訊",
+  "open-api.item.enabled": "啟用開放API",
+  "open-api.interfaces.title": "接口說明",
+  "open-api.interfaces.request": "請求格式",
+  "open-api.interfaces.response": "回應格式",
+  "open-api.interfaces.info.description": "獲取伺服器嘅基本資訊。",
+  "open-api.interfaces.monitor.description": "獲取伺服器目前嘅CPU、記憶體同TPS等監控資料。",
+  "open-api.interfaces.plugins.description": "獲取伺服器目前已安裝嘅插件/模組列表。",
+  "open-api.interfaces.players.description": "獲取伺服器目前在線玩家列表。",
+  "open-api.interfaces.player.description": "獲取某位玩家嘅詳細資訊。",
 
   "bukkit-config.title": "Bukkit 設定",
   "bukkit-config.description": "編輯Bukkit的服務端配置文件",
