@@ -195,7 +195,7 @@ export default function Terminal() {
           </div>
         </div>
         <div
-          className="bg-background flex-1 flex flex-col border rounded-sm"
+          className="min-h-0 bg-background flex-1 flex flex-col border rounded-sm"
           ref={terminalContainerRef}>
           <TerminalViewer client={client} level={logLevel} className="flex-1 border-none"/>
           <div className="p-3 flex gap-2">
