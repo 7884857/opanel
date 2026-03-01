@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useContext } from "react";
 import { compare } from "semver";
-import { Blocks, ClockFading, Earth, Gauge, HeartHandshake, PaintBucket, PencilRuler, ScrollText, SquareTerminal, Users } from "lucide-react";
+import { Blocks, ClockFading, Earth, Gauge, HeartHandshake, PaintBucket, PencilRuler, ScrollText, SquareTerminal, Unplug, Users } from "lucide-react";
 import { SiModelcontextprotocol } from "@icons-pack/react-simple-icons";
 import {
   Sidebar,
@@ -88,6 +88,11 @@ const configurationGroupItems = [
     name: "MCP",
     url: "/panel/mcp",
     icon: SiModelcontextprotocol
+  },
+  {
+    name: $("sidebar.config.open-api"),
+    url: "/panel/open-api",
+    icon: Unplug
   }
 ];
 

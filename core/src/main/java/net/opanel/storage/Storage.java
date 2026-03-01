@@ -3,6 +3,7 @@ package net.opanel.storage;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import net.opanel.config.McpConfiguration;
+import net.opanel.config.OpenAPIConfiguration;
 import net.opanel.task.ScheduledTask;
 
 import java.io.IOException;
@@ -19,13 +20,18 @@ public class Storage {
     private Storage() {
         registeredStorageFiles.put(StorageKey.SCHEDULED_TASKS, new StorageFile<>(
             "tasks.json",
-                new TypeToken<List<ScheduledTask>>() {}.getType(),
-                new ArrayList<ScheduledTask>()
+            new TypeToken<List<ScheduledTask>>() {}.getType(),
+            new ArrayList<ScheduledTask>()
         ));
         registeredStorageFiles.put(StorageKey.MCP_CONFIG, new StorageFile<>(
-                "mcp-config.json",
-                McpConfiguration.class,
-                new McpConfiguration(false)
+            "mcp-config.json",
+            McpConfiguration.class,
+            new McpConfiguration(false)
+        ));
+        registeredStorageFiles.put(StorageKey.OPEN_API_CONFIG, new StorageFile<>(
+            "open-api.json",
+            OpenAPIConfiguration.class,
+            new OpenAPIConfiguration(false)
         ));
     }
 

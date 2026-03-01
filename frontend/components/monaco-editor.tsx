@@ -76,7 +76,13 @@ monaco.editor.defineTheme("server-log-theme-dark", {
   }
 });
 
-export default function MonacoEditor(props: EditorProps) {
+export default function MonacoEditor({
+  onMount,
+  autoFitHeight = false,
+  ...props
+}: EditorProps & {
+  autoFitHeight?: boolean
+}) {
   useEffect(() => {
     if(typeof window === "undefined") return;
 
@@ -91,6 +97,11 @@ export default function MonacoEditor(props: EditorProps) {
             return new Worker(
               new URL("monaco-editor/esm/vs/language/json/json.worker", import.meta.url)
             );
+          case "typescript":
+          case "ts":
+            return new Worker(
+              new URL("monaco-editor/esm/vs/language/typescript/ts.worker", import.meta.url)
+            );
           case "yaml":
             return new Worker(
               new URL("monaco-yaml/yaml.worker", import.meta.url)
@@ -104,6 +115,26 @@ export default function MonacoEditor(props: EditorProps) {
     };
   }, []);
 
+  const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
+    if(!autoFitHeight) return;
+
+    const container = editor.getDomNode();
+    if(!container) return;
+
+    const lineCount = editor.getModel()?.getLineCount() ?? 1;
+    const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
+    const fitHeight = lineCount * lineHeight + editor.getOption(monaco.editor.EditorOption.padding).top + editor.getOption(monaco.editor.EditorOption.padding).bottom;
+    container.style.height = `${fitHeight}px`;
+    editor.layout();
+  };
+
   loader.config({ monaco });
-  return <Editor {...props}/>;
+  return (
+    <Editor
+      onMount={(editor, monaco) => {
+        handleEditorDidMount(editor);
+        onMount && onMount(editor, monaco);
+      }}
+      {...props}/>
+  );
 }

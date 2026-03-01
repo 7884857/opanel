@@ -12,6 +12,10 @@ import net.opanel.controller.BaseController;
 import net.opanel.controller.BeforeController;
 import net.opanel.controller.ErrorController;
 import net.opanel.controller.api.*;
+import net.opanel.controller.openapi.OpenInfoController;
+import net.opanel.controller.openapi.OpenMonitorController;
+import net.opanel.controller.openapi.OpenPlayersController;
+import net.opanel.controller.openapi.OpenPluginsController;
 import net.opanel.endpoint.InventoryEndpoint;
 import net.opanel.endpoint.PlayersEndpoint;
 import net.opanel.endpoint.TerminalEndpoint;
@@ -44,6 +48,21 @@ public class WebServer {
             // CORS configuration
             config.plugins.enableCors(cors -> {
                 cors.add(it -> {
+                    it.path = "/open-api/*";
+                    it.anyHost();
+                });
+                cors.add(it -> {
+                    it.path = "/api/*";
+                    it.allowHost("http://localhost:3001"); // for dev
+                    it.allowCredentials = true;
+                });
+                cors.add(it -> {
+                    it.path = "/assets/*";
+                    it.allowHost("http://localhost:3001"); // for dev
+                    it.allowCredentials = true;
+                });
+                cors.add(it -> {
+                    it.path = "/file/*";
                     it.allowHost("http://localhost:3001"); // for dev
                     it.allowCredentials = true;
                 });
@@ -65,7 +84,7 @@ public class WebServer {
         app.ws("/socket/inventory/{uuid}", ws -> new InventoryEndpoint(app, ws, plugin));
         app.ws("/socket/terminal", ws -> new TerminalEndpoint(app, ws, plugin));
 
-        // Controllers
+        // API Controllers
         BeforeController beforeController = new BeforeController(plugin);
         ErrorController errorController = new ErrorController(plugin);
         AssetsController assetsController = new AssetsController(plugin);
@@ -87,6 +106,7 @@ public class WebServer {
         WhitelistController whitelistController = new WhitelistController(plugin);
         TasksController tasksController = new TasksController(plugin);
         McpController mcpController = new McpController(plugin);
+        OpenAPIController openAPIController = new OpenAPIController(plugin);
 
         // API Routes
         app.before("/*", beforeController.beforeAll);
@@ -204,6 +224,32 @@ public class WebServer {
                 post("/", mcpController.toggleMcp);
                 get("/token", mcpController.getMaskedAccessToken);
                 post("/token", mcpController.generateAccessToken);
+            });
+            path("open-api", () -> {
+                get("/", openAPIController.getOpenAPIEnabled);
+                post("/", openAPIController.toggleOpenAPI);
+            });
+        }));
+
+        // Open API Controllers
+        OpenInfoController openInfoController = new OpenInfoController(plugin);
+        OpenMonitorController openMonitorController = new OpenMonitorController(plugin);
+        OpenPluginsController openPluginsController = new OpenPluginsController(plugin);
+        OpenPlayersController openPlayersController = new OpenPlayersController(plugin);
+
+        // Open API Routes
+        app.routes(() -> path("open-api", () -> {
+            before("/*", beforeController.handleOpenAPI);
+
+            get("info", openInfoController.getServerInfo);
+            get("monitor", openMonitorController.getMonitor);
+            path("plugins", () -> {
+                get("/", openPluginsController.getPlugins);
+                get("/icon/{fileName}", openPluginsController.getPluginIcon);
+            });
+            path("players", () -> {
+                get("/", openPlayersController.getPlayers);
+                get("/{uuid}", openPlayersController.getPlayerInfo);
             });
         }));
 

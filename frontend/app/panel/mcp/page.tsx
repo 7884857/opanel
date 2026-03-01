@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState, type PropsWithChildren } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { SiModelcontextprotocol } from "@icons-pack/react-simple-icons";
 import { Copy } from "lucide-react";
@@ -16,6 +16,7 @@ import { sendGetRequest, sendPostRequest, toastError } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { emitter } from "@/lib/emitter";
 import { GenerateTokenDialog } from "./generate-token-dialog";
+import { ConfigItem, ConfigSection } from "@/components/config-item";
 
 const MonacoEditor = dynamic(() => import("@/components/monaco-editor"), { ssr: false });
 
@@ -32,25 +33,6 @@ const mcpConfigJsonTemplate = `{
   }
 }
 `;
-
-function ConfigItem({
-  name,
-  description,
-  children
-}: PropsWithChildren & {
-  name: string
-  description?: string
-}) {
-  return (
-    <div className="flex justify-between items-center flex-wrap gap-2 px-4 py-3 border-b last:border-b-0">
-      <div className="flex flex-col gap-1">
-        <span className="text-sm">{name}</span>
-        <span className="text-xs text-muted-foreground">{description}</span>
-      </div>
-      {children}
-    </div>
-  );
-}
 
 export default function MCPConfiguration() {
   const { theme } = useTheme();
@@ -114,9 +96,8 @@ export default function MCPConfiguration() {
       description={$("mcp.description")}
       category={$("sidebar.config")}
       icon={<SiModelcontextprotocol />}
-      pageClassName="min-xl:px-64!"
-      className="[&>section]:bg-background [&>section]:dark:bg-transparent [&>section]:border [&>section]:rounded-md [&>section]:flex [&>section]:flex-col [&>section]:mb-4">
-      <section>
+      pageClassName="min-xl:px-64!">
+      <ConfigSection>
         <ConfigItem
           name={$("mcp.item.enabled")}
           description={$("mcp.item.enabled.description")}>
@@ -130,8 +111,8 @@ export default function MCPConfiguration() {
             checked={enabled}
             onCheckedChange={(enabled) => handleToggleMcp(enabled)}/>
         </ConfigItem>
-      </section>
-      <section>
+      </ConfigSection>
+      <ConfigSection>
         <ConfigItem name={$("mcp.item.access-token")}>
           <div className="w-full flex gap-2">
             <Input
@@ -176,7 +157,7 @@ export default function MCPConfiguration() {
             </div>
           </ConfigItem>
         )}
-      </section>
+      </ConfigSection>
     </SubPage>
   );
 }
