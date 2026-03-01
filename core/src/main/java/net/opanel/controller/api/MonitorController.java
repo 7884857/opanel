@@ -4,22 +4,24 @@ import io.javalin.http.Handler;
 import net.opanel.OPanel;
 import net.opanel.time.TPS;
 import net.opanel.controller.BaseController;
+import net.opanel.utils.MonitorUtility.CpuSampler;
 import oshi.SystemInfo;
 
 import java.util.HashMap;
 
-import static net.opanel.utils.MonitorUtility.*;
+import static net.opanel.utils.MonitorUtility.getMemoryRate;
 
 public class MonitorController extends BaseController {
+    private final SystemInfo si = new SystemInfo();
+    private final CpuSampler cpuSampler = new CpuSampler(si);
+
     public MonitorController(OPanel plugin) {
         super(plugin);
     }
 
     public Handler getMonitor = ctx -> {
-        SystemInfo si = new SystemInfo();
-
         HashMap<String, Object> obj = new HashMap<>();
-        obj.put("cpu", getCpuRate(si));
+        obj.put("cpu", cpuSampler.sampleRate());
         obj.put("memory", getMemoryRate(si));
         obj.put("tps", TPS.getRecentTPS());
 
