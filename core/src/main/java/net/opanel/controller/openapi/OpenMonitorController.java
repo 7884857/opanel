@@ -1,17 +1,17 @@
-package net.opanel.controller.api;
+package net.opanel.controller.openapi;
 
 import io.javalin.http.Handler;
 import net.opanel.OPanel;
-import net.opanel.time.TPS;
 import net.opanel.controller.BaseController;
+import net.opanel.time.TPS;
 import oshi.SystemInfo;
 
 import java.util.HashMap;
 
 import static net.opanel.utils.MonitorUtility.*;
 
-public class MonitorController extends BaseController {
-    public MonitorController(OPanel plugin) {
+public class OpenMonitorController extends BaseController {
+    public OpenMonitorController(OPanel plugin) {
         super(plugin);
     }
 

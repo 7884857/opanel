@@ -91,7 +91,7 @@ const configurationGroupItems = [
   },
   {
     name: $("sidebar.config.open-api"),
-    url: "/panel/api",
+    url: "/panel/open-api",
     icon: Unplug
   }
 ];

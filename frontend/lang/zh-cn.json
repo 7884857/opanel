@@ -499,6 +499,9 @@
 
   "open-api.title": "开放API",
   "open-api.description": "配置开放API以允许其他应用或网页获取服务器信息",
+  "open-api.fetch.error": "获取开放API状态失败",
+  "open-api.toggle.enable.error": "启用开放API失败",
+  "open-api.toggle.disable.error": "禁用开放API失败",
   "open-api.item.enabled": "启用开放API",
   "open-api.interfaces.title": "接口说明",
   "open-api.interfaces.request": "请求格式",

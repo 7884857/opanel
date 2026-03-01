@@ -4,6 +4,7 @@ import io.javalin.http.*;
 import io.javalin.http.servlet.JavalinServletContext;
 import net.opanel.OPanel;
 import net.opanel.config.McpConfiguration;
+import net.opanel.config.OpenAPIConfiguration;
 import net.opanel.storage.Storage;
 import net.opanel.storage.StorageKey;
 import net.opanel.web.JwtManager;
@@ -86,6 +87,14 @@ public class BeforeController extends BaseController {
         if(ctx.path().endsWith(".otf")) {
             ctx.status(HttpStatus.OK);
             ctx.contentType(ContentType.FONT_OTF);
+        }
+    };
+
+    public Handler handleOpenAPI = ctx -> {
+        OpenAPIConfiguration openAPIConfig = Storage.get().getStoredData(StorageKey.OPEN_API_CONFIG);
+        if(openAPIConfig == null || !openAPIConfig.enabled) {
+            sendResponse(ctx, HttpStatus.SERVICE_UNAVAILABLE, "Open API is not enabled.");
+            clearContextTasks(ctx);
         }
     };
 
