@@ -48,6 +48,21 @@ public class WebServer {
             // CORS configuration
             config.plugins.enableCors(cors -> {
                 cors.add(it -> {
+                    it.path = "/open-api/*";
+                    it.anyHost();
+                });
+                cors.add(it -> {
+                    it.path = "/api/*";
+                    it.allowHost("http://localhost:3001"); // for dev
+                    it.allowCredentials = true;
+                });
+                cors.add(it -> {
+                    it.path = "/assets/*";
+                    it.allowHost("http://localhost:3001"); // for dev
+                    it.allowCredentials = true;
+                });
+                cors.add(it -> {
+                    it.path = "/file/*";
                     it.allowHost("http://localhost:3001"); // for dev
                     it.allowCredentials = true;
                 });

@@ -15,7 +15,7 @@ public class OpenPlayersController extends BaseController {
         super(plugin);
     }
 
-    public Handler getPlayers = ctx -> { // for mcp
+    public Handler getPlayers = ctx -> {
         HashMap<String, Object> obj = new HashMap<>();
         List<HashMap<String, Object>> players = server.getPlayers().stream()
                 .map(player -> {

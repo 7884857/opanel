@@ -509,7 +509,7 @@
   "open-api.interfaces.info.description": "取得伺服器的基本資訊。",
   "open-api.interfaces.monitor.description": "取得伺服器目前的CPU、記憶體和TPS等監控資料。",
   "open-api.interfaces.plugins.description": "取得伺服器目前已安裝的插件/模組列表。",
-  "open-api.interfaces.players.description": "取得伺服器目前在線玩家列表。",
+  "open-api.interfaces.players.description": "取得伺服器玩家列表。",
   "open-api.interfaces.player.description": "取得某位玩家的詳細資訊。",
 
   "bukkit-config.title": "Bukkit 設定",

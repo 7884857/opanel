@@ -509,7 +509,7 @@
   "open-api.interfaces.info.description": "Get the basic server information.",
   "open-api.interfaces.monitor.description": "Get current CPU, memory, TPS, and other monitoring data of the server.",
   "open-api.interfaces.plugins.description": "Get the list of currently installed plugins/mods.",
-  "open-api.interfaces.players.description": "Get the list of currently online players.",
+  "open-api.interfaces.players.description": "Get the player list.",
   "open-api.interfaces.player.description": "Get detailed information of a specific player.",
 
   "bukkit-config.title": "Bukkit Configurations",
