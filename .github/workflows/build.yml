@@ -28,10 +28,11 @@ jobs:
         cache: 'npm'
         cache-dependency-path: ./frontend/package-lock.json
     - run: npm i
+    - run: npm run prelaunch
     
     - name: Run lint
       run: npm run lint
-      
+
     - name: Run unit tests
       run: npm run test
 
