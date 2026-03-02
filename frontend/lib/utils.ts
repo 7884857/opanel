@@ -49,7 +49,7 @@ export function getCurrentState<T>(setState: SetState<T>): Promise<T> {
  * ```
  */
 export function getInputtedArgumentStr(str: string, cursor: number): string {
-  if(cursor > str.length) throw new Error("Cursor position is out of the length of the string.");
+  if(cursor < 0 || cursor > str.length) throw new Error("Cursor position is out of the length of the string.");
 
   const trimmed = str.substring(0, cursor);
   const arr = trimmed.split(" ");
@@ -64,7 +64,7 @@ export function getInputtedArgumentStr(str: string, cursor: number): string {
  * ```
  */
 export function getCurrentArgumentIndex(str: string, cursor: number): number {
-  if(cursor > str.length) throw new Error("Cursor position is out of the length of the string.");
+  if(cursor < 0 || cursor > str.length) throw new Error("Cursor position is out of the length of the string.");
 
   const trimmed = str.substring(0, cursor);
   const arr = trimmed.split(" ");
@@ -106,6 +106,7 @@ export function base64ToString(base64: string): string {
 }
 
 export function isNumeric(str: string): boolean {
+  str = str.trim();
   if(str === "") return false;
   return !Number.isNaN(Number(str));
 }
