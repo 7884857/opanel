@@ -73,6 +73,7 @@ OPanel
 ├─ fabric-<mc_version>/                    # Fabric 版本实现
 ├─ forge-<mc_version>/                     # Forge 版本实现
 ├─ neoforge-<mc_version>/                  # NeoForge 版本实现
+├─ pumpkin/                                # Pumpkin Rust版本实现
 └─ ...
 ```
 
@@ -119,6 +120,10 @@ useEffect(() => {
 - Java的依赖若需要进行Shadow Jar的Relocate，必须Relocate到`net.opanel.deps.*`包下
 - 编写对话框dialog时，必须单独新建xxx-dialog.tsx文件
 - 使用DataTable组件，编写columns定义时，必须单独新建columns.tsx文件
+
+### Rust 相关（Pumpkin服务端部分）
+
+- 文件全部使用Tab缩进，缩进大小为2
 
 ## 启动 & 调试
 

@@ -2,8 +2,14 @@ const fs = require("fs");
 const path = require("path");
 
 const distDir = path.resolve(process.cwd(), "build");
-const targetDir = path.resolve(process.cwd(), "../core/src/main/resources/web");
 
-fs.rmSync(targetDir, { recursive: true });
-fs.mkdirSync(targetDir);
-fs.cpSync(distDir, targetDir, { recursive: true });
+// Java resources
+copyToTarget(path.resolve(process.cwd(), "../core/src/main/resources/web"));
+// Pumpkin resources
+copyToTarget(path.resolve(process.cwd(), "../pumpkin/resources/web"));
+
+function copyToTarget(targetDir) {
+  fs.rmSync(targetDir, { recursive: true });
+  fs.mkdirSync(targetDir);
+  fs.cpSync(distDir, targetDir, { recursive: true });
+}
