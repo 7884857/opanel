@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Unplug } from "lucide-react";
 import { SubPage } from "../sub-page";
@@ -8,6 +9,7 @@ import { ConfigItem, ConfigSection } from "@/components/config-item";
 import { Switch } from "@/components/ui/switch";
 import { sendGetRequest, sendPostRequest, toastError } from "@/lib/api";
 import { Interface, InterfaceDescription, InterfaceRequest, InterfaceResponse } from "./interface";
+import { Text } from "@/components/i18n-text";
 
 export default function OpenAPI() {
   const [enabled, setEnabled] = useState(false);
@@ -57,6 +59,18 @@ export default function OpenAPI() {
       </ConfigSection>
       {enabled && (
         <>
+          <Text
+            className="block text-sm text-muted-foreground mb-4"
+            id="open-api.hint"
+            args={[
+              <Link
+                href="https://opanel.cn"
+                target="_blank"
+                rel="noopener noreferrer"
+                key={0}>
+                opanel.cn
+              </Link>
+            ]}/>
           <h2 className="text-lg font-semibold pl-1 mb-3">{$("open-api.interfaces.title")}</h2>
           <ConfigSection>
             <Interface method="GET" route="/open-api/info">

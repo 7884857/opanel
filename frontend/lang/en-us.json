@@ -500,6 +500,7 @@
 
   "open-api.title": "Open API",
   "open-api.description": "Configure Open API to allow other applications or web pages to access server information",
+  "open-api.hint": "If you can place a link to the official website {0} on your webpage, it would be a great support for this project!",
   "open-api.fetch.error": "Failed to get Open API status",
   "open-api.toggle.enable.error": "Failed to enable Open API",
   "open-api.toggle.disable.error": "Failed to disable Open API",
