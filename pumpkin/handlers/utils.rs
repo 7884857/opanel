@@ -1,36 +1,62 @@
 use axum::{
-	Json, http::{HeaderValue, StatusCode, header::LOCATION}, response::{IntoResponse, Response}
+	Json, body::Bytes, http::{HeaderValue, StatusCode, header}, response::{IntoResponse, Response}
 };
 use serde_json::{Value, json};
 
-pub fn ok(mut data: Value) -> (StatusCode, Json<Value>) {
+pub fn send_ok(mut data: Value) -> Response {
 	data["code"] = json!(200);
 	data["error"] = json!("");
 
 	(
 		StatusCode::OK,
 		Json(data)
-	)
+	).into_response()
 }
 
-pub async fn not_implemented() -> (StatusCode, Json<Value>) {
-  (
-    StatusCode::NOT_IMPLEMENTED,
-    Json(json!({
-      "code": 501,
-      "error": "Route exists but is not implemented yet"
-    })),
-  )
+pub fn send_status(code: StatusCode) -> Response {
+	send_status_with_msg(code, code.canonical_reason().unwrap_or(""))
 }
 
-pub async fn not_found() -> (StatusCode, Json<Value>) {
-  (
-    StatusCode::NOT_FOUND,
-    Json(json!({
-      "code": 404,
-      "error": "Not found"
-    })),
-  )
+pub fn send_status_with_msg(code: StatusCode, msg: &str) -> Response {
+	(
+		code,
+		Json(json!({
+			"code": code.as_u16(),
+			"error": msg
+		})),
+	).into_response()
+}
+
+pub async fn send_content(bytes: Bytes, content_type: &str) -> Response {
+	let mut response = bytes.into_response();
+	response.headers_mut().insert(
+		header::CONTENT_TYPE,
+		HeaderValue::from_str(content_type).unwrap_or_else(|_| HeaderValue::from_static("application/octet-stream")),
+	);
+	response
+}
+
+pub async fn send_content_with_name(bytes: Bytes, content_type: &str, name: &str) -> Response {
+	let mut response = send_content(bytes, content_type).await;
+	if let Ok(header_value) = HeaderValue::from_str(&format!("attachment; filename=\"{}\"", name)) {
+		response.headers_mut().insert(header::CONTENT_DISPOSITION, header_value);
+	}
+	response
+}
+
+pub async fn send_content_via_path(path: &str, content_type: &str) -> Response {
+	match tokio::fs::read(path).await {
+		Ok(bytes) => send_content(bytes.into(), content_type).await,
+		Err(_) => send_status(StatusCode::NOT_FOUND),
+	}
+}
+
+pub fn not_implemented() -> Response {
+  send_status(StatusCode::NOT_IMPLEMENTED)
+}
+
+pub fn not_found() -> Response {
+  send_status(StatusCode::NOT_FOUND)
 }
 
 pub fn query_contains_key(query: Option<&str>, key: &str) -> bool {
@@ -74,7 +100,7 @@ pub fn append_query_to_path(path: String, query: Option<&str>) -> String {
 pub fn response_redirect_found(location: &str) -> Response {
 	let mut response = StatusCode::FOUND.into_response();
 	if let Ok(header_value) = HeaderValue::from_str(location) {
-		response.headers_mut().insert(LOCATION, header_value);
+		response.headers_mut().insert(header::LOCATION, header_value);
 		return response;
 	}
 	StatusCode::NOT_FOUND.into_response()

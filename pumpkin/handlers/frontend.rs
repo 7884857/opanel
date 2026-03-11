@@ -6,20 +6,20 @@ use axum::{
 use include_dir::{Dir, File, include_dir};
 use mime_guess::from_path;
 
-use crate::handlers::utils::not_found;
+use crate::handlers::utils::send_status;
 
 static WEB_DIR: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/pumpkin/resources/web");
 
 pub async fn static_fallback(uri: Uri, req: Request) -> Response {
 	if req.method().as_str() != "GET" && req.method().as_str() != "HEAD" {
-		return not_found().await.into_response();
+		return send_status(StatusCode::NOT_FOUND);
 	}
 
 	if let Some((path, file, status)) = resolve_static_file(uri.path()) {
 		return static_file_response(path, file, status);
 	}
 
-	not_found().await.into_response()
+	send_status(StatusCode::NOT_FOUND)
 }
 
 fn resolve_static_file(path: &str) -> Option<(String, &'static File<'static>, StatusCode)> {

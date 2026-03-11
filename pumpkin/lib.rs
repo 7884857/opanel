@@ -6,6 +6,7 @@ use tokio::runtime::Runtime;
 
 mod web;
 mod handlers;
+mod utils;
 
 #[plugin_method]
 pub async fn on_load(&mut self, ctx: Arc<Context>) -> Result<(), String> {
