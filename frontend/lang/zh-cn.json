@@ -500,6 +500,7 @@
 
   "open-api.title": "开放API",
   "open-api.description": "配置开放API以允许其他应用或网页获取服务器信息",
+  "open-api.hint": "如果您能在网页中放上本项目官网{0}的声明和链接，将是对本项目的极大支持！",
   "open-api.fetch.error": "获取开放API状态失败",
   "open-api.toggle.enable.error": "启用开放API失败",
   "open-api.toggle.disable.error": "禁用开放API失败",
