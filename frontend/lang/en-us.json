@@ -508,9 +508,13 @@
   "open-api.interfaces.title": "API Reference",
   "open-api.interfaces.request": "Request Schema",
   "open-api.interfaces.response": "Response Schema",
+  "open-api.interfaces.info": "Info",
   "open-api.interfaces.info.description": "Get the basic server information.",
+  "open-api.interfaces.monitor": "Monitor",
   "open-api.interfaces.monitor.description": "Get current CPU, memory, TPS, and other monitoring data of the server.",
+  "open-api.interfaces.plugins": "Plugins",
   "open-api.interfaces.plugins.description": "Get the list of currently installed plugins/mods.",
+  "open-api.interfaces.players": "Players",
   "open-api.interfaces.players.description": "Get the player list.",
   "open-api.interfaces.player.description": "Get detailed information of a specific player.",
 

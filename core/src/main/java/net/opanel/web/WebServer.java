@@ -228,6 +228,8 @@ public class WebServer {
             path("open-api", () -> {
                 get("/", openAPIController.getOpenAPIEnabled);
                 post("/", openAPIController.toggleOpenAPI);
+                get("/{interfaceName}", openAPIController.getInterfaceEnabled);
+                post("/{interfaceName}", openAPIController.toggleInterface);
             });
         }));
 

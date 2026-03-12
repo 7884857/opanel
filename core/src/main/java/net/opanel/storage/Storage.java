@@ -31,7 +31,7 @@ public class Storage {
         registeredStorageFiles.put(StorageKey.OPEN_API_CONFIG, new StorageFile<>(
             "open-api.json",
             OpenAPIConfiguration.class,
-            new OpenAPIConfiguration(false)
+            new OpenAPIConfiguration(false, OpenAPIConfiguration.createDefaultInterfaces())
         ));
     }
 

@@ -2,6 +2,10 @@ package net.opanel.storage;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import net.opanel.OPanel;
 import net.opanel.utils.Utils;
 
@@ -10,11 +14,14 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Map;
 
 public class StorageFile<T> {
     private final Gson gson;
     private final Path filePath;
     private final Type dataType;
+    private final T defaultValue;
+    private final JsonElement defaultJsonTree;
 
     public StorageFile(String fileName, Type dataType, T defaultValue) {
         this(
@@ -43,6 +50,8 @@ public class StorageFile<T> {
         filePath = OPanel.OPANEL_DIR_PATH.resolve(fileName);
         this.dataType = dataType;
         this.gson = gson;
+        this.defaultValue = defaultValue;
+        this.defaultJsonTree = gson.toJsonTree(defaultValue, dataType);
 
         if(!Files.exists(filePath)) {
             try {
@@ -55,11 +64,55 @@ public class StorageFile<T> {
 
     public T read() throws IOException {
         String rawText = Utils.readTextFile(filePath);
-        return gson.fromJson(rawText, dataType);
+        JsonElement jsonTree;
+
+        try {
+            jsonTree = JsonParser.parseString(rawText);
+        } catch (JsonSyntaxException e) {
+            write(defaultValue);
+            return defaultValue;
+        }
+
+        if(jsonTree == null || jsonTree.isJsonNull()) {
+            write(defaultValue);
+            return defaultValue;
+        }
+
+        if(fillMissingValues(jsonTree, defaultJsonTree)) {
+            Files.writeString(filePath, gson.toJson(jsonTree), StandardOpenOption.TRUNCATE_EXISTING);
+        }
+
+        return gson.fromJson(jsonTree, dataType);
     }
 
     public void write(T obj) throws IOException {
         String jsonText = gson.toJson(obj);
         Files.writeString(filePath, jsonText, StandardOpenOption.TRUNCATE_EXISTING);
+    }
+
+    private boolean fillMissingValues(JsonElement target, JsonElement defaults) {
+        if(!target.isJsonObject() || !defaults.isJsonObject()) return false;
+
+        JsonObject targetObject = target.getAsJsonObject();
+        JsonObject defaultObject = defaults.getAsJsonObject();
+        boolean updated = false;
+
+        for(Map.Entry<String, JsonElement> entry : defaultObject.entrySet()) {
+            String key = entry.getKey();
+            JsonElement defaultValue = entry.getValue();
+
+            if(!targetObject.has(key)) {
+                targetObject.add(key, defaultValue.deepCopy());
+                updated = true;
+                continue;
+            }
+
+            JsonElement targetValue = targetObject.get(key);
+            if(fillMissingValues(targetValue, defaultValue)) {
+                updated = true;
+            }
+        }
+
+        return updated;
     }
 }

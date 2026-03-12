@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Unplug } from "lucide-react";
+import { Blocks, Gauge, Info, Unplug, Users } from "lucide-react";
 import { SubPage } from "../sub-page";
 import { $ } from "@/lib/i18n";
 import { ConfigItem, ConfigSection } from "@/components/config-item";
 import { Switch } from "@/components/ui/switch";
 import { sendGetRequest, sendPostRequest, toastError } from "@/lib/api";
-import { Interface, InterfaceDescription, InterfaceRequest, InterfaceResponse } from "./interface";
+import { Interface, InterfaceDescription, InterfaceRequest, InterfaceResponse, InterfaceSection } from "./interface";
 import { Text } from "@/components/i18n-text";
 
 export default function OpenAPI() {
@@ -72,7 +72,7 @@ export default function OpenAPI() {
               </Link>
             ]}/>
           <h2 className="text-lg font-semibold pl-1 mb-3">{$("open-api.interfaces.title")}</h2>
-          <ConfigSection>
+          <InterfaceSection interfaceName="info" icon={Info}>
             <Interface method="GET" route="/open-api/info">
               <InterfaceDescription>
                 {$("open-api.interfaces.info.description")}
@@ -96,6 +96,8 @@ export default function OpenAPI() {
   }
 }`}/>
             </Interface>
+          </InterfaceSection>
+          <InterfaceSection interfaceName="monitor" icon={Gauge}>
             <Interface method="GET" route="/open-api/monitor">
               <InterfaceDescription>
                 {$("open-api.interfaces.monitor.description")}
@@ -107,6 +109,8 @@ export default function OpenAPI() {
   tps: number
 }`}/>
             </Interface>
+          </InterfaceSection>
+          <InterfaceSection interfaceName="plugins" icon={Blocks}>
             <Interface method="GET" route="/open-api/plugins">
               <InterfaceDescription>
                 {$("open-api.interfaces.plugins.description")}
@@ -127,8 +131,8 @@ export default function OpenAPI() {
   }[]
 }`}/>
             </Interface>
-          </ConfigSection>
-          <ConfigSection>
+          </InterfaceSection>
+          <InterfaceSection interfaceName="players" icon={Users}>
             <Interface method="GET" route="/open-api/players">
               <InterfaceDescription>
                 {$("open-api.interfaces.players.description")}
@@ -157,7 +161,7 @@ export default function OpenAPI() {
   banReason?: string
 }`}/>
             </Interface>
-          </ConfigSection>
+          </InterfaceSection>
         </>
       )}
     </SubPage>

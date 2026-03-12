@@ -95,8 +95,35 @@ public class BeforeController extends BaseController {
         if(openAPIConfig == null || !openAPIConfig.enabled) {
             sendResponse(ctx, HttpStatus.SERVICE_UNAVAILABLE, "Open API is not enabled.");
             clearContextTasks(ctx);
+            return;
+        }
+
+        String interfaceName = getOpenAPIInterfaceName(ctx.path());
+        if(interfaceName == null || !OpenAPIConfiguration.isValidInterfaceName(interfaceName)) {
+            return;
+        }
+
+        if(openAPIConfig.interfaces == null) return;
+
+        Boolean interfaceEnabled = openAPIConfig.interfaces.get(interfaceName);
+        if(interfaceEnabled != null && !interfaceEnabled) {
+            sendResponse(ctx, HttpStatus.SERVICE_UNAVAILABLE, "Interface '"+ interfaceName +"' is not enabled.");
+            clearContextTasks(ctx);
         }
     };
+
+    private String getOpenAPIInterfaceName(String path) {
+        final String prefix = "/open-api/";
+        if(path == null || !path.startsWith(prefix)) return null;
+
+        String routePath = path.substring(prefix.length());
+        if(routePath.isEmpty()) return null;
+
+        int splitIndex = routePath.indexOf('/');
+        if(splitIndex == -1) return routePath;
+
+        return routePath.substring(0, splitIndex);
+    }
 
     private void clearContextTasks(Context ctx) {
         ((JavalinServletContext) ctx).getTasks().clear();
