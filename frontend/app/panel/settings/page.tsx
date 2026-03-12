@@ -16,6 +16,7 @@ import {
 import { controlWidth, SettingsNumberInput, SettingsSwitch } from "./settings-control";
 import { Button } from "@/components/ui/button";
 import { LoginBannerDialog } from "./login-banner-dialog";
+import { LaunchCommandDialog } from "./launch-command-dialog";
 import { SecurityDialog } from "./security-dialog";
 import { UpdateDialog } from "./update-dialog";
 import { cn } from "@/lib/utils";
@@ -217,6 +218,17 @@ export default function Settings() {
               <LoginBannerDialog asChild>
                 <Button className="cursor-pointer" size="sm">{$("settings.appearance.login-banner.modify")}</Button>
               </LoginBannerDialog>
+            }/>
+        </Section>
+        <Section title={$("settings.server.title")}>
+          <SettingsItem
+            id="server.launch-command"
+            name={$("settings.server.launch-command")}
+            description={$("settings.server.launch-command.description")}
+            control={
+              <LaunchCommandDialog asChild>
+                <Button className="cursor-pointer" size="sm">{$("settings.server.launch-command.modify")}</Button>
+              </LaunchCommandDialog>
             }/>
         </Section>
         <Section title="OPanel">

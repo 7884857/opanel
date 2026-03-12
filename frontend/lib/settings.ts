@@ -39,6 +39,7 @@ export type SettingsStorageType = {
   "monaco.word-wrap": boolean
   "monaco.font-size": number
   "appearance.login-banner"?: never
+  "server.launch-command"?: never
   "system.language": LanguageCode
   "system.preview-channel": boolean
   "system.mcp"?: never

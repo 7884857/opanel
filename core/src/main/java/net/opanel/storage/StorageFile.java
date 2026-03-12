@@ -22,6 +22,7 @@ public class StorageFile<T> {
     private final Type dataType;
     private final T defaultValue;
     private final JsonElement defaultJsonTree;
+    private final boolean isPlainText;
 
     public StorageFile(String fileName, Type dataType, T defaultValue) {
         this(
@@ -52,6 +53,7 @@ public class StorageFile<T> {
         this.gson = gson;
         this.defaultValue = defaultValue;
         this.defaultJsonTree = gson.toJsonTree(defaultValue, dataType);
+        isPlainText = false;
 
         if(!Files.exists(filePath)) {
             try {
@@ -62,8 +64,29 @@ public class StorageFile<T> {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public StorageFile(String fileName, String defaultValue) {
+        filePath = OPanel.OPANEL_DIR_PATH.resolve(fileName);
+        dataType = null;
+        gson = null;
+        this.defaultValue = (T) defaultValue;
+        defaultJsonTree = null;
+        isPlainText = true;
+
+        if(!Files.exists(filePath)) {
+            try {
+                Files.writeString(filePath, defaultValue, StandardOpenOption.CREATE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     public T read() throws IOException {
         String rawText = Utils.readTextFile(filePath);
+        if(isPlainText) return (T) rawText;
+
         JsonElement jsonTree;
 
         try {
@@ -86,7 +109,7 @@ public class StorageFile<T> {
     }
 
     public void write(T obj) throws IOException {
-        String jsonText = gson.toJson(obj);
+        String jsonText = isPlainText ? (String) obj : gson.toJson(obj);
         Files.writeString(filePath, jsonText, StandardOpenOption.TRUNCATE_EXISTING);
     }
 

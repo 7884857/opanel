@@ -1,7 +1,11 @@
 package net.opanel.common;
 
+import net.opanel.OPanel;
+import net.opanel.storage.Storage;
+import net.opanel.storage.StorageKey;
 import net.opanel.utils.Utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
@@ -53,6 +57,42 @@ public interface OPanelServer {
     void setGamerules(HashMap<String, Object> gamerules);
     void reload();
     void stop();
+
+    default void restart() {
+        final String launchCommand = Storage.get().getStoredData(StorageKey.LAUNCH_COMMAND);
+
+        try {
+            final Path cwd = Path.of(".").toRealPath();
+
+            String os = System.getProperty("os.name").toLowerCase();
+            String[] command;
+            if(os.contains("win")) { // windows
+                command = new String[] { "cmd.exe", "/c", "start", "", "cmd.exe", "/c", "timeout 10 > NUL && "+ launchCommand };
+            } else if(os.contains("mac")) { // mac
+                final String scriptContent = new StringBuilder()
+                    .append("#!/bin/bash").append("\n")
+                    .append("sleep 10").append("\n")
+                    .append("cd \"").append(cwd.toAbsolutePath()).append("\"").append("\n")
+                    .append(launchCommand).append("\n")
+                    .append("rm -- \"$0\"")
+                    .toString();
+
+                Path scriptPath = OPanel.TMP_DIR_PATH.resolve("temp_restart.command");
+                Utils.writeTextFile(scriptPath, scriptContent);
+                command = new String[] { "open", scriptPath.toAbsolutePath().toString() };
+            } else { // linux / other servers
+                command = new String[] { "bash", "-c", "nohup bash -c 'sleep 10 && "+ launchCommand +"'" };
+            }
+
+            new ProcessBuilder(command)
+                .directory(cwd.toFile())
+                .start();
+            stop();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     long getIngameTime();
     Path getPluginsPath();
     List<OPanelPlugin> getPlugins();
