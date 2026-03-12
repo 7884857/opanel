@@ -1,3 +1,5 @@
+use std::{fs, io, path::Path};
+
 use rand::{rngs::OsRng, Rng, RngCore};
 
 pub fn generate_random_int(min: i32, max: i32) -> i32 {
@@ -44,4 +46,9 @@ pub fn generate_random_char_sequence(length: usize, special_chars: bool) -> Stri
   }
 
   result
+}
+
+pub fn is_dir_empty(path: &Path) -> io::Result<bool> {
+  let mut entries = fs::read_dir(path)?;
+  Ok(entries.next().is_none())
 }
