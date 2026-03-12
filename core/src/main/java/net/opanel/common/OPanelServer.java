@@ -86,7 +86,8 @@ public interface OPanelServer {
 
                 command = new String[] { "open", scriptPath.toString() };
             } else { // linux / other servers
-                command = new String[] { "bash", "-c", "nohup bash -c 'sleep 10 && "+ launchCommand +"'" };
+                final String safeLaunchCommand = launchCommand.replaceAll("'", "'\\''");
+                command = new String[] { "bash", "-c", "nohup bash -c 'sleep 10 && "+ safeLaunchCommand +"'" };
             }
 
             new ProcessBuilder(command)
