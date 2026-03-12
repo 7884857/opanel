@@ -500,7 +500,7 @@
 
   "open-api.title": "開放API",
   "open-api.description": "配置開放API以允許其他應用程式或網頁取得伺服器資訊",
-  "open-api.hint": "如果您能在網頁中放上本項目官網{0}的聲明和鏈接，將是对本項目的极大支持！",
+  "open-api.hint": "如果您能喺網頁中放上本項目官網{0}嘅聲明同鏈接，將會係對本項目嘅極大支持！",
   "open-api.fetch.error": "獲取開放API狀態失敗",
   "open-api.toggle.enable.error": "啟用開放API失敗",
   "open-api.toggle.disable.error": "禁用開放API失敗",
