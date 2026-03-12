@@ -36,7 +36,7 @@ public class ControlController extends BaseController {
 
     public Handler setServerProperties = ctx -> {
         try {
-            final String properties = ctx.body().replaceAll("\"", "");;
+            final String properties = ctx.body();
             if(properties.isEmpty()) {
                 sendResponse(ctx, HttpStatus.BAD_REQUEST, "server.properties content is missing.");
                 return;
@@ -83,7 +83,7 @@ public class ControlController extends BaseController {
                 return;
             }
 
-            final String content = ctx.body().replaceAll("\"", "");
+            final String content = ctx.body();
             ((CodeOfConductFeature) server).updateOrCreateCodeOfConduct(lang, !content.isEmpty() ? Utils.base64ToString(content) : "");
             sendResponse(ctx, HttpStatus.OK);
         } catch (IOException e) {
@@ -199,7 +199,7 @@ public class ControlController extends BaseController {
                 return;
             }
 
-            final String content = ctx.body().replaceAll("\"", "");;
+            final String content = ctx.body();
             if(content.isEmpty()) {
                 sendResponse(ctx, HttpStatus.BAD_REQUEST, "Config content is missing.");
                 return;
@@ -249,7 +249,7 @@ public class ControlController extends BaseController {
 
         try {
             final String worldName = ctx.queryParam("world");
-            final String content = ctx.body().replaceAll("\"", "");;
+            final String content = ctx.body();
             if(content.isEmpty()) {
                 sendResponse(ctx, HttpStatus.BAD_REQUEST, "Config content is missing.");
             }
@@ -276,7 +276,7 @@ public class ControlController extends BaseController {
 
     public Handler setLaunchCommand = ctx -> {
         try {
-            final String launchCommand = ctx.body().replaceAll("\"", "");;
+            final String launchCommand = ctx.body();
             if(launchCommand.isEmpty()) {
                 sendResponse(ctx, HttpStatus.BAD_REQUEST, "Launch command is missing.");
                 return;

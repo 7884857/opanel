@@ -52,7 +52,11 @@ export async function sendGetBlobRequest(route: string, withCredentials = true):
 }
 
 export async function sendPostRequest<R, T = any>(route: string, body?: T, withCredentials = true): Promise<APIResponse<R>> {
-  const data = body ? JSON.stringify(body) : "";
+  const data = body ? (
+    typeof body === "string"
+    ? body
+    : JSON.stringify(body)
+  ) : "";
   
   return (await axios.request({
     method: "post",
@@ -65,7 +69,11 @@ export async function sendPostRequest<R, T = any>(route: string, body?: T, withC
 }
 
 export async function sendPatchRequest<R, T = any>(route: string, body?: T, withCredentials = true): Promise<APIResponse<R>> {
-  const data = body ? JSON.stringify(body) : "";
+  const data = body ? (
+    typeof body === "string"
+    ? body
+    : JSON.stringify(body)
+  ) : "";
   
   return (await axios.request({
     method: "patch",
@@ -78,7 +86,11 @@ export async function sendPatchRequest<R, T = any>(route: string, body?: T, with
 }
 
 export async function sendDeleteRequest<T = any>(route: string, body?: T, withCredentials = true): Promise<APIResponse<never>> {
-  const data = body ? JSON.stringify(body) : "";
+  const data = body ? (
+    typeof body === "string"
+    ? body
+    : JSON.stringify(body)
+  ) : "";
   
   return (await axios.request({
     method: "delete",
