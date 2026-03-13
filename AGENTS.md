@@ -108,11 +108,49 @@ useEffect(() => {
   // ...
 }, [client, /*...*/]);
 ```
+- 在编写有多行props的jsx组件时，结尾的`/>`需要和最后一个prop在同一行，且中间不能有空格隔开，如：
+```tsx
+<MyComponent
+  className="flex justify-center gap-2"
+  propsA="hello"
+  propsB="world"/>
+```
 
 ### 代码规范
 
 - 对于前端部分，请查看`/frontend/eslint.config.mjs`，特别注意import语句的顺序
 - 对于后端与游戏具体实现部分，与前后代码风格一致即可
+
+### i18n 国际化文案
+
+#### 命名规则
+
+i18n 键名使用 **kebab-case**，遵循以下格式：
+
+```
+<page>.[...<component>].<part>
+```
+
+- `<page>`: 页面名称（独立组件使用的通用文案可省略，使用 `common` 作为前缀）
+- `[...<component>]`: 组件名称，可按层级从上到下嵌套
+- `<part>`: 组件部分的名称，如 `placeholder`、`description`、`tooltip`、`loading` 等
+
+特殊规则：
+- 浏览器标签页标题的 id 应仅为页面名称（如 `"about": "About"`）
+- 错误消息的 id 应使用 `error` 作为组件名（如 `common.error.400`）
+- 通用文案（跨页面/组件共享）使用 `common.` 前缀，如 `common.copy.success`
+
+详见 `/frontend/lang/README.md`
+
+#### 分类和顺序
+
+语言文件中的键应按以下顺序组织：
+
+1. `$lang` - 语言名称标识
+2. `common.*` - 通用文案（按子分类排序：error、gamemode、difficulty、copy、controls 等）
+3. 各页面文案（按页面名称字母顺序排列：about、login、panel...）
+
+同一分类内的键应按逻辑顺序排列（参考已有的文案排序），保持各语言文件结构一致。不同分类的i18n文案中间应用一个空行隔开。
 
 ### 其他
 

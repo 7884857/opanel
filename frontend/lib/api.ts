@@ -1,6 +1,7 @@
 import type { APIResponse } from "./types";
 import axios, { type AxiosError } from "axios";
 import { toast } from "sonner";
+import { $ } from "./i18n";
 
 export const apiUrl = (
   (process.env.NODE_ENV === "development")
@@ -132,4 +133,14 @@ export async function logout(): Promise<boolean> {
   } catch (e: any) {
     return false;
   }
+}
+
+export function restartServer() {
+  sendPostRequest("/api/control/restart");
+  toast.loading($("common.controls.restart"));
+}
+
+export function stopServer() {
+  sendPostRequest("/api/control/stop");
+  toast.loading($("common.controls.stop"));
 }

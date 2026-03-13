@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { ConfigItem } from "./config-item";
 import { useKeydown } from "@/hooks/use-keydown";
 import { Spinner } from "@/components/ui/spinner";
+import { toastRestartAlert } from "@/components/restart-alert";
 
 const MonacoEditor = dynamic(() => import("@/components/monaco-editor"), { ssr: false });
 
@@ -72,6 +73,7 @@ export default function BukkitConfig() {
       emitter.emit("refresh-data");
       setIsSaving(false);
       setSaved(true);
+      toastRestartAlert();
     } catch (e: any) {
       toastError(e, $("bukkit-config.save.error", currentEditing), [
         [400, $("common.error.400")],

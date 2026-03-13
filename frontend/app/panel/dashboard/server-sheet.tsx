@@ -37,6 +37,7 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { $ } from "@/lib/i18n";
 import { Text } from "@/components/i18n-text";
+import { useRestartAlert } from "@/hooks/use-restart-alert";
 
 export function ServerSheet({
   children,
@@ -44,6 +45,7 @@ export function ServerSheet({
 }: PropsWithChildren & {
   asChild?: boolean
 }) {
+  const { restartAlert, openRestartAlert } = useRestartAlert();
   const [properties, setProperties] = useState<ServerProperties>({});
   const [hasChanged, setChanged] = useState<boolean>(false);
   const propertiesMap = useMemo(() => objectToMap(properties), [properties]);
@@ -92,9 +94,10 @@ export function ServerSheet({
 
     try {
       await sendPostRequest(`/api/control/properties`, transformText(stringToBase64(rawProperties)));
-      toast.success($("dashboard.properties.save.success"), { description: $("dashboard.properties.save.success.description") });
+      toast.success($("dashboard.properties.save.success"));
       setChanged(false);
       setProperties({});
+      openRestartAlert();
     } catch (e: any) {
       toastError(e, $("dashboard.properties.save.error"), [
         [401, $("common.error.401")],
@@ -209,6 +212,7 @@ export function ServerSheet({
           </form>
         </Form>
       </SheetContent>
+      {restartAlert}
     </Sheet>
   );
 }

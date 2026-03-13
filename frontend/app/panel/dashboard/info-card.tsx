@@ -5,7 +5,7 @@ import { Pencil, PenLine, Power, RefreshCw, RotateCw, Settings, UserPen } from "
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { base64ToString, cn } from "@/lib/utils";
-import { apiUrl, sendPostRequest } from "@/lib/api";
+import { apiUrl, sendPostRequest, restartServer, stopServer } from "@/lib/api";
 import { InfoContext, MonitorContext, VersionContext } from "@/contexts/api-context";
 import { MinecraftText } from "@/components/mc-text";
 import { Badge } from "@/components/ui/badge";
@@ -94,9 +94,8 @@ function ControlButtonGroup({
           title={$("dashboard.info.controls.restart.alert.title")}
           description={$("dashboard.info.controls.restart.alert.description")}
           onAction={() => {
-            sendPostRequest("/api/control/restart");
             setIsRestartingServer(true);
-            toast.loading($("dashboard.info.controls.restart.loading"));
+            restartServer();
           }}
           asChild>
           <Button
@@ -115,9 +114,8 @@ function ControlButtonGroup({
           title={$("dashboard.info.controls.stop.alert.title")}
           description={$("dashboard.info.controls.stop.alert.description")}
           onAction={() => {
-            sendPostRequest("/api/control/stop");
             setIsStoppingServer(true);
-            toast.loading($("dashboard.info.controls.stop.loading"));
+            stopServer();
           }}
           asChild>
           <Button
