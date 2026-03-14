@@ -144,11 +144,14 @@ public class WebServer {
                 delete("code-of-conduct", controlController.removeCodeOfConduct);
                 post("stop", controlController.stopServer);
                 post("reload", controlController.reloadServer);
+                post("restart", controlController.restartServer);
                 post("world", controlController.switchSave);
                 get("bukkit-config", controlController.getBukkitServerConfig);
                 post("bukkit-config", controlController.setBukkitServerConfig);
                 get("paper-world-config", controlController.getPaperWorldConfig);
                 post("paper-world-config", controlController.setPaperWorldConfig);
+                get("launch-command", controlController.getLaunchCommand);
+                post("launch-command", controlController.setLaunchCommand);
             });
             path("gamerules", () -> {
                 get("/", gamerulesController.getGamerules);

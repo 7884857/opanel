@@ -1,6 +1,7 @@
 import type { APIResponse } from "./types";
 import axios, { type AxiosError } from "axios";
 import { toast } from "sonner";
+import { $ } from "./i18n";
 
 export const apiUrl = (
   (process.env.NODE_ENV === "development")
@@ -52,7 +53,11 @@ export async function sendGetBlobRequest(route: string, withCredentials = true):
 }
 
 export async function sendPostRequest<R, T = any>(route: string, body?: T, withCredentials = true): Promise<APIResponse<R>> {
-  const data = body ? JSON.stringify(body) : "";
+  const data = body ? (
+    typeof body === "string"
+    ? body
+    : JSON.stringify(body)
+  ) : "";
   
   return (await axios.request({
     method: "post",
@@ -65,7 +70,11 @@ export async function sendPostRequest<R, T = any>(route: string, body?: T, withC
 }
 
 export async function sendPatchRequest<R, T = any>(route: string, body?: T, withCredentials = true): Promise<APIResponse<R>> {
-  const data = body ? JSON.stringify(body) : "";
+  const data = body ? (
+    typeof body === "string"
+    ? body
+    : JSON.stringify(body)
+  ) : "";
   
   return (await axios.request({
     method: "patch",
@@ -78,7 +87,11 @@ export async function sendPatchRequest<R, T = any>(route: string, body?: T, with
 }
 
 export async function sendDeleteRequest<T = any>(route: string, body?: T, withCredentials = true): Promise<APIResponse<never>> {
-  const data = body ? JSON.stringify(body) : "";
+  const data = body ? (
+    typeof body === "string"
+    ? body
+    : JSON.stringify(body)
+  ) : "";
   
   return (await axios.request({
     method: "delete",
@@ -120,4 +133,14 @@ export async function logout(): Promise<boolean> {
   } catch (e: any) {
     return false;
   }
+}
+
+export function restartServer() {
+  sendPostRequest("/api/control/restart");
+  toast.loading($("common.controls.restart"));
+}
+
+export function stopServer() {
+  sendPostRequest("/api/control/stop");
+  toast.loading($("common.controls.stop"));
 }

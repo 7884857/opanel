@@ -33,6 +33,10 @@ public class Storage {
             OpenAPIConfiguration.class,
             new OpenAPIConfiguration(false, OpenAPIConfiguration.createDefaultInterfaces())
         ));
+        registeredStorageFiles.put(StorageKey.LAUNCH_COMMAND, new StorageFile<>(
+            "launch-command.txt",
+            "java -jar server.jar nogui"
+        ));
     }
 
     @SuppressWarnings("unchecked")

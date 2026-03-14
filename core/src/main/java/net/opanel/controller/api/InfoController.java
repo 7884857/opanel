@@ -54,7 +54,7 @@ public class InfoController extends BaseController {
 
     public Handler setMotd = ctx -> {
         try {
-            String motd = ctx.bodyAsClass(String.class);
+            final String motd = ctx.body();
             if(motd.isEmpty() || motd.trim().isEmpty()) {
                 sendResponse(ctx, HttpStatus.BAD_REQUEST, "Motd is missing.");
                 return;

@@ -1,11 +1,11 @@
 "use client";
 
 import { useContext, useRef, useState } from "react";
-import { Pencil, PenLine, Power, RotateCw, Settings, UserPen } from "lucide-react";
+import { Pencil, PenLine, Power, RefreshCw, RotateCw, Settings, UserPen } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { base64ToString, cn } from "@/lib/utils";
-import { apiUrl, sendPostRequest } from "@/lib/api";
+import { apiUrl, sendPostRequest, restartServer, stopServer } from "@/lib/api";
 import { InfoContext, MonitorContext, VersionContext } from "@/contexts/api-context";
 import { MinecraftText } from "@/components/mc-text";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,7 @@ import { googleSansCode } from "@/lib/fonts";
 import { $ } from "@/lib/i18n";
 
 import PackIcon from "@/assets/images/pack.png";
+import { ButtonGroup } from "@/components/ui/button-group";
 
 function ControlButtonGroup({
   className
@@ -29,6 +30,7 @@ function ControlButtonGroup({
   const versionCtx = useContext(VersionContext);
   const ctx = useContext(InfoContext);
   const [isReloadingServer, setIsReloadingServer] = useState(false);
+  const [isRestartingServer, setIsRestartingServer] = useState(false);
   const [isStoppingServer, setIsStoppingServer] = useState(false);
 
   return (
@@ -87,27 +89,48 @@ function ControlButtonGroup({
         }}>
         <RotateCw />
       </Button>
-      <Alert
-        title={$("dashboard.info.controls.stop.alert.title")}
-        description={$("dashboard.info.controls.stop.alert.description")}
-        onAction={() => {
-          sendPostRequest("/api/control/stop");
-          setIsStoppingServer(true);
-          toast.loading($("dashboard.info.controls.stop.loading"));
-        }}
-        asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          title={$("dashboard.info.controls.stop")}
-          disabled={isStoppingServer}>
-          {
-            isStoppingServer
-            ? <Spinner />
-            : <Power />
-          }
-        </Button>
-      </Alert>
+      <ButtonGroup>
+        <Alert
+          title={$("dashboard.info.controls.restart.alert.title")}
+          description={$("dashboard.info.controls.restart.alert.description")}
+          onAction={() => {
+            setIsRestartingServer(true);
+            restartServer();
+          }}
+          asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            title={$("dashboard.info.controls.restart")}
+            disabled={isRestartingServer}>
+            {
+              isRestartingServer
+              ? <Spinner />
+              : <RefreshCw />
+            }
+          </Button>
+        </Alert>
+        <Alert
+          title={$("dashboard.info.controls.stop.alert.title")}
+          description={$("dashboard.info.controls.stop.alert.description")}
+          onAction={() => {
+            setIsStoppingServer(true);
+            stopServer();
+          }}
+          asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            title={$("dashboard.info.controls.stop")}
+            disabled={isStoppingServer}>
+            {
+              isStoppingServer
+              ? <Spinner />
+              : <Power />
+            }
+          </Button>
+        </Alert>
+      </ButtonGroup>
     </div>
   );
 }

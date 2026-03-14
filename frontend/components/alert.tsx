@@ -17,6 +17,8 @@ export function Alert({
   description,
   cancellable = true,
   onAction,
+  open,
+  onOpenChange,
   asChild,
   children
 }: PropsWithChildren<{
@@ -24,13 +26,17 @@ export function Alert({
   description?: string | React.ReactNode
   cancellable?: boolean
   onAction?: () => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   asChild?: boolean
 }>) {
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild={asChild}>
-        {children}
-      </AlertDialogTrigger>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      {children && (
+        <AlertDialogTrigger asChild={asChild}>
+          {children}
+        </AlertDialogTrigger>
+      )}
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="wrap-anywhere">{title}</AlertDialogTitle>

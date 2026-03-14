@@ -8,6 +8,8 @@ import net.opanel.common.OPanelServer;
 import net.opanel.common.ServerType;
 import net.opanel.common.features.BukkitConfigFeature;
 import net.opanel.common.features.CodeOfConductFeature;
+import net.opanel.storage.Storage;
+import net.opanel.storage.StorageKey;
 import net.opanel.utils.Utils;
 import net.opanel.controller.BaseController;
 
@@ -34,7 +36,7 @@ public class ControlController extends BaseController {
 
     public Handler setServerProperties = ctx -> {
         try {
-            final String properties = ctx.body().replaceAll("\"", "");;
+            final String properties = ctx.body();
             if(properties.isEmpty()) {
                 sendResponse(ctx, HttpStatus.BAD_REQUEST, "server.properties content is missing.");
                 return;
@@ -81,7 +83,7 @@ public class ControlController extends BaseController {
                 return;
             }
 
-            final String content = ctx.body().replaceAll("\"", "");
+            final String content = ctx.body();
             ((CodeOfConductFeature) server).updateOrCreateCodeOfConduct(lang, !content.isEmpty() ? Utils.base64ToString(content) : "");
             sendResponse(ctx, HttpStatus.OK);
         } catch (IOException e) {
@@ -118,6 +120,11 @@ public class ControlController extends BaseController {
 
     public Handler reloadServer = ctx -> {
         server.reload();
+        sendResponse(ctx, HttpStatus.OK);
+    };
+
+    public Handler restartServer = ctx -> {
+        server.restart();
         sendResponse(ctx, HttpStatus.OK);
     };
 
@@ -192,7 +199,7 @@ public class ControlController extends BaseController {
                 return;
             }
 
-            final String content = ctx.body().replaceAll("\"", "");;
+            final String content = ctx.body();
             if(content.isEmpty()) {
                 sendResponse(ctx, HttpStatus.BAD_REQUEST, "Config content is missing.");
                 return;
@@ -242,7 +249,7 @@ public class ControlController extends BaseController {
 
         try {
             final String worldName = ctx.queryParam("world");
-            final String content = ctx.body().replaceAll("\"", "");;
+            final String content = ctx.body();
             if(content.isEmpty()) {
                 sendResponse(ctx, HttpStatus.BAD_REQUEST, "Config content is missing.");
             }
@@ -256,6 +263,28 @@ public class ControlController extends BaseController {
         } catch (NoSuchFileException e) {
             sendResponse(ctx, HttpStatus.NOT_FOUND, "Cannot find the world config.");
         } catch (IOException e) {
+            e.printStackTrace();
+            sendResponse(ctx, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    };
+
+    public Handler getLaunchCommand = ctx -> {
+        HashMap<String, Object> obj = new HashMap<>();
+        obj.put("launchCommand", Storage.get().getStoredData(StorageKey.LAUNCH_COMMAND));
+        sendResponse(ctx, obj);
+    };
+
+    public Handler setLaunchCommand = ctx -> {
+        try {
+            final String launchCommand = ctx.body();
+            if(launchCommand.isEmpty()) {
+                sendResponse(ctx, HttpStatus.BAD_REQUEST, "Launch command is missing.");
+                return;
+            }
+
+            Storage.get().setStoredData(StorageKey.LAUNCH_COMMAND, launchCommand);
+            sendResponse(ctx, HttpStatus.OK);
+        } catch (Exception e) {
             e.printStackTrace();
             sendResponse(ctx, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }

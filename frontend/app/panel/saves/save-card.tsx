@@ -14,6 +14,7 @@ import { emitter } from "@/lib/emitter";
 import { googleSansCode } from "@/lib/fonts";
 import { $ } from "@/lib/i18n";
 import { DatapacksDialog } from "./datapacks-dialog";
+import { toastRestartAlert } from "@/components/restart-alert";
 
 export function SaveCard({
   save,
@@ -51,13 +52,7 @@ export function SaveCard({
     try {
       await sendPostRequest(`/api/control/world?save=${name}`);
       emitter.emit("refresh-data");
-      toast.success($("saves.list.item.switch.success"), {
-        description: (
-          !isRunning
-          ? $("saves.list.item.switch.success.description1")
-          : $("saves.list.item.switch.success.description2")
-        )
-      });
+      toastRestartAlert();
     } catch (e: any) {
       toastError(e, $("saves.list.item.switch.error"), [
         [400, $("common.error.400")],

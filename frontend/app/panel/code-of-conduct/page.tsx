@@ -28,6 +28,7 @@ import {
   FilesEditorStatusBar,
   FilesEditorStatusBarItem
 } from "@/components/ui/files-editor";
+import { toastRestartAlert } from "@/components/restart-alert";
 
 const MonacoEditor = dynamic(() => import("@/components/monaco-editor"), { ssr: false });
 
@@ -106,6 +107,7 @@ export default function CodeOfConduct() {
     try {
       await sendPostRequest(`/api/control/code-of-conduct?lang=${lang}`, stringToBase64(current));
       emitter.emit("refresh-data");
+      toastRestartAlert();
     } catch (e: any) {
       toastError(e, $("coc.save.error"), [
         [400, $("common.error.400")],
