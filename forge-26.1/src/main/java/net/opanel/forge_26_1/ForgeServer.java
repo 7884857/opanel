@@ -229,7 +229,7 @@ public class ForgeServer extends BaseForgeServer implements OPanelServer, CodeOf
 
     @Override
     public long getIngameTime() {
-        return server.overworld().getGameTime();
+        return server.overworld().getOverworldClockTime();
     }
 
     @Override
