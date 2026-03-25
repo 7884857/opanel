@@ -57,7 +57,7 @@ dependencies {
 shadowJar {
     configurations = [project.configurations.shadowImplementation]
 
-    archiveBaseName.set(base.archivesName.map { it + "-shadow" })
+    archiveBaseName.set(baseName +"-shadow")
     archiveClassifier.set('')
 
     relocate 'com.google.gson', 'net.opanel.deps.gson'
@@ -75,7 +75,7 @@ remapJar {
     dependsOn shadowJar
     mustRunAfter shadowJar
     inputFile.set(shadowJar.archiveFile)
-    archiveBaseName.set(base.archivesName.map { it + "-build" })
+    archiveBaseName.set(baseName +"-build")
     destinationDirectory.set(file("../build/libs"))
 }
 

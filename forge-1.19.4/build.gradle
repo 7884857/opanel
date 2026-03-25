@@ -71,7 +71,7 @@ tasks.named('processResources', ProcessResources) {
 shadowJar {
     configurations = [project.configurations.shadowImplementation]
 
-    archiveBaseName.set(base.archivesName.map { it + "-build" })
+    archiveBaseName.set(baseName +"-build")
     archiveClassifier.set('')
     destinationDirectory.set(file("../build/libs"))
 
