@@ -2,7 +2,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'com.gradleup.shadow' version '8.3.8'
-    id 'net.neoforged.gradle.userdev' version '7.0.192'
+    id 'net.neoforged.gradle.userdev' version '7.1.21'
     id "org.ipnmod.neosync"
 }
 
@@ -57,9 +57,9 @@ tasks.named('processResources', ProcessResources) {
 shadowJar {
     configurations = [project.configurations.shadowImplementation]
 
-    archiveBaseName = baseName +"-build"
-    archiveClassifier = ''
-    destinationDirectory = file "../build/libs"
+    archiveBaseName.set(base.archivesName.map { it + "-build" })
+    archiveClassifier.set('')
+    destinationDirectory.set(file("../build/libs"))
 
     relocate 'com.google.gson', 'net.opanel.deps.gson'
     relocate 'com.google.errorprone', 'net.opanel.deps.errorprone'
