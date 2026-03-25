@@ -1,18 +1,21 @@
-package net.opanel.forge_1_20_1;
+package net.opanel.forge_26_1;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.status.ServerStatus;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.IpBanListEntry;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRule;
+import net.minecraft.world.level.gamerules.GameRuleType;
+import net.minecraft.world.level.gamerules.GameRuleTypeVisitor;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.locating.IModFile;
+import net.opanel.annotation.Rewrite;
 import net.opanel.common.*;
+import net.opanel.common.features.CodeOfConductFeature;
 import net.opanel.forge_helper.BaseForgeServer;
-import net.opanel.utils.Utils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -24,7 +27,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class ForgeServer extends BaseForgeServer implements OPanelServer {
+public class ForgeServer extends BaseForgeServer implements OPanelServer, CodeOfConductFeature {
     public ForgeServer(MinecraftServer server) {
         super(server);
     }
@@ -59,11 +62,11 @@ public class ForgeServer extends BaseForgeServer implements OPanelServer {
                 status.forgeData()
         );
         try {
-            Field statusIconField = MinecraftServer.class.getDeclaredField("f_271173_"); // f_271173_ -> statusIcon
+            Field statusIconField = MinecraftServer.class.getDeclaredField("statusIcon");
             statusIconField.setAccessible(true);
             statusIconField.set(server, favicon);
 
-            Field statusField = MinecraftServer.class.getDeclaredField("f_129757_"); // f_129757_ -> status
+            Field statusField = MinecraftServer.class.getDeclaredField("status");
             statusField.setAccessible(true);
             statusField.set(server, newStatus);
         } catch (Exception e) {
@@ -104,7 +107,7 @@ public class ForgeServer extends BaseForgeServer implements OPanelServer {
         List<OPanelPlayer> list = new ArrayList<>();
         List<ServerPlayer> players = server.getPlayerList().getPlayers();
         for(ServerPlayer serverPlayer : players) {
-            ForgePlayer player = new ForgePlayer(serverPlayer);
+            ForgePlayer player = new ForgePlayer(serverPlayer, server);
             list.add(player);
         }
         return list;
@@ -142,7 +145,7 @@ public class ForgeServer extends BaseForgeServer implements OPanelServer {
     public List<String> getBannedIps() {
         Collection<IpBanListEntry> entries = server.getPlayerList().getIpBans().getEntries();
         List<String> list = new ArrayList<>();
-        entries.forEach(entry -> list.add(entry.getDisplayName().getString()));
+        entries.forEach(entry -> list.add(entry.getUser()));
         return list;
     }
 
@@ -165,7 +168,7 @@ public class ForgeServer extends BaseForgeServer implements OPanelServer {
 
     @Override
     public void setWhitelistEnabled(boolean enabled) {
-        server.getPlayerList().setUsingWhiteList(enabled);
+        server.setUsingWhitelist(enabled);
     }
 
     @Override
@@ -175,46 +178,49 @@ public class ForgeServer extends BaseForgeServer implements OPanelServer {
 
     @Override
     public HashMap<String, Object> getGamerules() {
-        final CompoundTag gamerulesNbt = server.getGameRules().createTag();
         HashMap<String, Object> gamerules = new HashMap<>();
-        for(String key : gamerulesNbt.getAllKeys()) {
-            final String valueStr = gamerulesNbt.getString(key);
-            if(valueStr.equals("true") || valueStr.equals("false")) {
-                gamerules.put(key, Boolean.valueOf(valueStr));
-            } else if(Utils.isNumeric(valueStr)) {
-                gamerules.put(key, Integer.valueOf(valueStr));
-            } else {
-                gamerules.put(key, valueStr);
+        final GameRules gameRulesObj = server.overworld().getGameRules();
+        gameRulesObj.visitGameRuleTypes(new GameRuleTypeVisitor() {
+            @Override
+            public <T> void visit(GameRule<T> rule) {
+                GameRuleTypeVisitor.super.visit(rule);
+
+                final String ruleName = rule.getIdentifier().toShortString();
+                final T value = gameRulesObj.get(rule);
+                gamerules.put(ruleName, value);
             }
-        }
+        });
         return gamerules;
     }
 
     @Override
     public void setGamerules(HashMap<String, Object> gamerules) {
         HashMap<String, Object> currentGamerules = getGamerules();
-        final GameRules gameRulesObj = server.getGameRules();
-        GameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
+        final GameRules gameRulesObj = server.overworld().getGameRules();
+        gameRulesObj.visitGameRuleTypes(new GameRuleTypeVisitor() {
             @Override
             @SuppressWarnings("unchecked")
-            public <T extends GameRules.Value<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
-                GameRules.GameRuleTypeVisitor.super.visit(key, type);
+            public <T> void visit(GameRule<T> rule) {
+                GameRuleTypeVisitor.super.visit(rule);
 
-                final String ruleName = key.getId();
-                final Object value = gamerules.get(ruleName);
-                if(value == null) return;
+                final GameRuleType type = rule.gameRuleType();
+                final String ruleName = rule.getIdentifier().toShortString();
+                final T value = (T) gamerules.get(ruleName);
+
                 final Object currentValue = currentGamerules.get(ruleName);
                 if(value.equals(currentValue)) return;
 
-                T rule = type.createRule();
-                if(rule instanceof GameRules.BooleanValue) { // boolean
-                    ((GameRules.BooleanValue) rule).set((boolean) value, server);
-                    gameRulesObj.getRule(key).setFrom(rule, server);
-                } else if(rule instanceof GameRules.IntegerValue) { // integer
-                    int n = ((Number) value).intValue();
-                    ((GameRules.IntegerValue) rule).set(n, server);
-                    gameRulesObj.getRule(key).setFrom(rule, server);
-                } else { // string
+                try {
+                    if(type == GameRuleType.INT) {
+                        Integer n = ((Number) value).intValue();
+                        gameRulesObj.set(rule, (T) n, server);
+                    } else if(value instanceof Double) {
+                        Double n = ((Number) value).doubleValue();
+                        gameRulesObj.set(rule, (T) n, server);
+                    } else {
+                        gameRulesObj.set(rule, value, server);
+                    }
+                } catch (Exception e) {
                     sendServerCommand("gamerule "+ ruleName +" "+ value);
                 }
             }
@@ -223,7 +229,7 @@ public class ForgeServer extends BaseForgeServer implements OPanelServer {
 
     @Override
     public long getIngameTime() {
-        return server.overworld().getDayTime();
+        return server.overworld().getGameTime();
     }
 
     @Override
@@ -233,7 +239,7 @@ public class ForgeServer extends BaseForgeServer implements OPanelServer {
         List<String> loadedPluginFileNames = new ArrayList<>();
 
         // Get loaded mods from Forge ModList
-        for(IModInfo modInfo : ModList.get().getMods()) {
+        for(IModInfo modInfo : ModList.getMods()) {
             String modId = modInfo.getModId();
 
             // Skip built-in mods
@@ -336,7 +342,7 @@ public class ForgeServer extends BaseForgeServer implements OPanelServer {
             Path newPath = pluginsPath.resolve(fileName.replaceAll("\\"+ OPanelPlugin.DISABLED_SUFFIX +"$", ""));
             Files.move(originalPath, newPath);
         } else if(!isActuallyDisabled && !enabled) {
-            for(IModInfo modInfo : ModList.get().getMods()) {
+            for(IModInfo modInfo : ModList.getMods()) {
                 if(fileName.equals(modInfo.getOwningFile().getFile().getFileName())) {
                     throw new IllegalStateException("Cannot disable a loaded mod.");
                 }
