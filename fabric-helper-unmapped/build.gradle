@@ -1,10 +1,10 @@
 plugins {
-    id 'net.fabricmc.fabric-loom-remap'
+    id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
     id 'java-library'
 }
 
 base {
-    archivesName = "fabric-helper"
+    archivesName = "fabric-helper-unmapped"
 }
 
 repositories {
@@ -16,10 +16,9 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${common_minecraft_version}"
-    mappings "net.fabricmc:yarn:${common_yarn_mappings}:v2"
-    modCompileOnly "net.fabricmc:fabric-loader:${common_fabric_loader_version}"
-    modCompileOnly "net.fabricmc.fabric-api:fabric-api:${common_fabric_api_version}+${common_minecraft_version}"
-    modCompileOnly "space.nocp:configx:2.0.3"
+    compileOnly "net.fabricmc:fabric-loader:${common_fabric_loader_version}"
+    compileOnly "net.fabricmc.fabric-api:fabric-api:${common_fabric_api_version}+${common_minecraft_version}"
+    compileOnly "space.nocp:configx:2.0.3"
     compileOnly(project(":core"))
 }
 
@@ -38,6 +37,6 @@ tasks.named('processResources', ProcessResources) {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
