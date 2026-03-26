@@ -1,7 +1,7 @@
 plugins {
     /* This plugin is workaround for https://github.com/neoforged/NeoGradle/issues/282 */
     id 'org.ipnmod.neosync' version '1.2.0'
-    id 'fabric-loom' version '1.13-SNAPSHOT' apply false
+    id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT' apply false
     id 'java'
 }
 

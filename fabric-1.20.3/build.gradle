@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom'
+    id 'net.fabricmc.fabric-loom-remap'
     id 'com.gradleup.shadow' version '8.3.8'
 }
 
@@ -7,7 +7,7 @@ configurations {
     shadowImplementation
     implementation.extendsFrom(shadowImplementation)
 
-    all {
+    configureEach {
         resolutionStrategy {
             force "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}+${minecraft_version}"
         }
