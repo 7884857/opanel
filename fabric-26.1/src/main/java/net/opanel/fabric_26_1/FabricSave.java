@@ -25,6 +25,7 @@ import java.util.Optional;
 
 public class FabricSave extends BaseFabricSave implements OPanelSave {
     private CompoundTag nbt;
+    private CompoundTag difficultySettingsNbt;
 
     public FabricSave(MinecraftServer server, Path path) {
         super(server, path);
@@ -36,6 +37,12 @@ public class FabricSave extends BaseFabricSave implements OPanelSave {
                 throw new IOException("Cannot find a valid level.dat");
             }
             nbt = optionalNbt.get();
+
+            Optional<CompoundTag> optionalDifficultySettingsNbt = nbt.getCompound("difficulty_settings");
+            if(optionalDifficultySettingsNbt.isEmpty()) {
+                throw new IOException("Cannot read difficulty_settings");
+            }
+            difficultySettingsNbt = optionalDifficultySettingsNbt.get();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -46,6 +53,12 @@ public class FabricSave extends BaseFabricSave implements OPanelSave {
         CompoundTag dataNbt = new CompoundTag();
         dataNbt.put("Data", nbt);
         NbtIo.writeCompressed(dataNbt, savePath.resolve("level.dat"));
+    }
+
+    @Override
+    protected void saveDifficultySettings() throws IOException {
+        nbt.put("difficulty_settings", difficultySettingsNbt);
+        saveNbt();
     }
 
     @Override
@@ -75,38 +88,38 @@ public class FabricSave extends BaseFabricSave implements OPanelSave {
     public OPanelDifficulty getDifficulty() throws IOException {
         if(isCurrent()) return OPanelDifficulty.fromId(getCurrentWorld().getDifficulty().getId());
 
-        byte difficulty = nbt.getByteOr("Difficulty", (byte) 0);
-        return OPanelDifficulty.fromId(difficulty);
+        String difficulty = difficultySettingsNbt.getStringOr("difficulty", "easy");
+        return OPanelDifficulty.fromString(difficulty);
     }
 
     @Override
     public void setDifficulty(OPanelDifficulty difficulty) throws IOException {
         if(isCurrent()) server.setDifficulty(Difficulty.byName(difficulty.getName()), true);
 
-        nbt.putByte("Difficulty", (byte) difficulty.getId());
-        saveNbt();
+        difficultySettingsNbt.putString("difficulty", difficulty.getName());
+        saveDifficultySettings();
     }
 
     @Override
     public boolean isDifficultyLocked() throws IOException {
         if(isCurrent()) return getCurrentWorld().getLevelData().isDifficultyLocked();
 
-        return nbt.getByteOr("DifficultyLocked", (byte) 0) == 1;
+        return difficultySettingsNbt.getByteOr("locked", (byte) 0) == 1;
     }
 
     @Override
     public void setDifficultyLocked(boolean locked) throws IOException {
         if(isCurrent()) server.setDifficultyLocked(locked);
 
-        nbt.putByte("DifficultyLocked", (byte) (locked ? 1 : 0));
-        saveNbt();
+        difficultySettingsNbt.putByte("locked", (byte) (locked ? 1 : 0));
+        saveDifficultySettings();
     }
 
     @Override
     public boolean isHardcore() throws IOException {
         if(isCurrent()) return server.isHardcore();
 
-        return nbt.getByteOr("hardcore", (byte) 0) == 1;
+        return difficultySettingsNbt.getByteOr("hardcore", (byte) 0) == 1;
     }
 
     @Override
@@ -137,8 +150,8 @@ public class FabricSave extends BaseFabricSave implements OPanelSave {
             FabricUtils.forceUpdateProperties((DedicatedServer) server);
         }
 
-        nbt.putByte("hardcore", (byte) (enabled ? 1 : 0));
-        saveNbt();
+        difficultySettingsNbt.putByte("hardcore", (byte) (enabled ? 1 : 0));
+        saveDifficultySettings();
     }
 
     @Override

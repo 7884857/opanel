@@ -22,6 +22,7 @@ public abstract class BaseFabricSave implements OPanelSave {
     }
 
     protected abstract void saveNbt() throws IOException;
+    protected abstract void saveDifficultySettings() throws IOException;
 
     protected ServerLevel getCurrentWorld() {
         return server.overworld();
