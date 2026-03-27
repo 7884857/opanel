@@ -1,10 +1,13 @@
 package net.opanel.spigot_26_1;
 
+import net.opanel.annotation.Rewrite;
 import net.opanel.bukkit_helper.BaseBukkitOfflinePlayer;
 import net.opanel.common.OPanelPlayer;
 import org.bukkit.*;
 import org.bukkit.profile.PlayerProfile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
 
 public class SpigotOfflinePlayer extends BaseBukkitOfflinePlayer implements OPanelPlayer {
@@ -14,6 +17,17 @@ public class SpigotOfflinePlayer extends BaseBukkitOfflinePlayer implements OPan
         super(plugin, server, player);
 
         profile = player.getPlayerProfile();
+    }
+
+    @Rewrite
+    @Override
+    protected Path getPlayerDataPath() {
+        String uuid = player.getUniqueId().toString();
+        Path path = server.getWorlds().getFirst().getWorldFolder().toPath().resolve("players/data/"+ uuid +".dat");
+        if(!Files.exists(path)) {
+            throw new NullPointerException("Player data file for UUID "+ uuid +" unavailable.");
+        }
+        return path;
     }
 
     @Override

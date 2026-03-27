@@ -29,11 +29,12 @@ public class Main extends JavaPlugin implements Listener, TaskRunner {
 
     @Override
     public void onEnable() {
-        if(!NBT.preloadApi()) {
-            LOGGER.warning("Cannot start OPanel plugin: NBT-API is not initialized properly.");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
+        // see https://github.com/tr7zw/Item-NBT-API/issues/349
+//        if(!NBT.preloadApi()) {
+//            LOGGER.warning("Cannot start OPanel plugin: NBT-API is not initialized properly.");
+//            Bukkit.getPluginManager().disablePlugin(this);
+//            return;
+//        }
 
         final LoggerImpl logger = new LoggerImpl(LOGGER);
 
