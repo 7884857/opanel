@@ -65,3 +65,4 @@ include 'folia-1.21'
 include 'folia-1.21.11'
 
 include 'fabric-helper-unmapped'
+include 'spigot-26.1'
