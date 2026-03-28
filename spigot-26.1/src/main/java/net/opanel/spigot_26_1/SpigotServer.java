@@ -2,6 +2,7 @@ package net.opanel.spigot_26_1;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.tree.CommandNode;
+import net.opanel.annotation.Rewrite;
 import net.opanel.bukkit_helper.BaseBukkitServer;
 import net.opanel.bukkit_helper.utils.BukkitUtils;
 import net.opanel.common.*;
@@ -109,6 +110,14 @@ public class SpigotServer extends BaseBukkitServer implements OPanelServer, Code
             }
         }
         return list;
+    }
+
+    @Rewrite
+    @Override
+    public void removePlayerData(String uuid) throws IOException {
+        final Path playerDataFolder = server.getWorlds().getFirst().getWorldFolder().toPath().resolve("players/data");
+        Files.deleteIfExists(playerDataFolder.resolve(uuid +".dat"));
+        Files.deleteIfExists(playerDataFolder.resolve(uuid +".dat_old"));
     }
 
     @Override
