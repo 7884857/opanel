@@ -35,6 +35,7 @@ public class Main extends JavaPlugin implements Listener, TaskRunner {
 //            Bukkit.getPluginManager().disablePlugin(this);
 //            return;
 //        }
+        NBT.preloadApi();
 
         final LoggerImpl logger = new LoggerImpl(LOGGER);
 
