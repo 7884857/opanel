@@ -5,6 +5,7 @@ import net.opanel.OPanel;
 import net.opanel.common.OPanelDifficulty;
 import net.opanel.common.OPanelGameMode;
 import net.opanel.common.OPanelSave;
+import net.opanel.common.features.BukkitDimensionFeature;
 import net.opanel.utils.Utils;
 import net.opanel.utils.ZipUtility;
 import net.opanel.controller.BaseController;
@@ -80,11 +81,13 @@ public class SavesController extends BaseController {
              * Bukkit separates nether and the end dimension from the save folder,
              * so we need to put them together when processing the save files
              */
-            if(server.getServerType().isBukkitSeries()) {
-                Path netherDim = Paths.get("").resolve(saveName +"_nether/DIM-1");
-                Path theEndDim = Paths.get("").resolve(saveName +"_the_end/DIM1");
-                if(Files.exists(netherDim)) Utils.copyDirectoryRecursively(netherDim, savePath.resolve("DIM-1"));
-                if(Files.exists(theEndDim)) Utils.copyDirectoryRecursively(theEndDim, savePath.resolve("DIM1"));
+            if(server.getServerType().isBukkitSeries() && save instanceof BukkitDimensionFeature) {
+                BukkitDimensionFeature feat = (BukkitDimensionFeature) save;
+
+                Path netherDim = Paths.get("").resolve(saveName +"_nether").resolve(feat.getNetherPath());
+                Path theEndDim = Paths.get("").resolve(saveName +"_the_end").resolve(feat.getTheEndPath());
+                if(Files.exists(netherDim)) Utils.copyDirectoryRecursively(netherDim, savePath.resolve(feat.getNetherPath()));
+                if(Files.exists(theEndDim)) Utils.copyDirectoryRecursively(theEndDim, savePath.resolve(feat.getTheEndPath()));
             }
 
             ZipUtility.zip(savePath, zipPath);
@@ -93,9 +96,11 @@ public class SavesController extends BaseController {
                 Files.delete(zipPath);
 
                 // Finally, don't forget to delete the DIM-1 and DIM1 folders manually copied by us
-                if(server.getServerType().isBukkitSeries()) {
-                    if(Files.exists(savePath.resolve("DIM-1"))) Utils.deleteDirectoryRecursively(savePath.resolve("DIM-1"));
-                    if(Files.exists(savePath.resolve("DIM1"))) Utils.deleteDirectoryRecursively(savePath.resolve("DIM1"));
+                if(server.getServerType().isBukkitSeries() && save instanceof BukkitDimensionFeature) {
+                    BukkitDimensionFeature feat = (BukkitDimensionFeature) save;
+
+                    if(Files.exists(savePath.resolve(feat.getNetherPath()))) Utils.deleteDirectoryRecursively(savePath.resolve(feat.getNetherPath()));
+                    if(Files.exists(savePath.resolve(feat.getTheEndPath()))) Utils.deleteDirectoryRecursively(savePath.resolve(feat.getTheEndPath()));
                 }
             });
 
@@ -105,9 +110,11 @@ public class SavesController extends BaseController {
         } catch (Exception e) {
             // Delete the files if some exceptions are thrown
             if(Files.exists(zipPath)) Files.delete(zipPath);
-            if(server.getServerType().isBukkitSeries()) {
-                if(Files.exists(savePath.resolve("DIM-1"))) Utils.deleteDirectoryRecursively(savePath.resolve("DIM-1"));
-                if(Files.exists(savePath.resolve("DIM1"))) Utils.deleteDirectoryRecursively(savePath.resolve("DIM1"));
+            if(server.getServerType().isBukkitSeries() && save instanceof BukkitDimensionFeature) {
+                BukkitDimensionFeature feat = (BukkitDimensionFeature) save;
+
+                if(Files.exists(savePath.resolve(feat.getNetherPath()))) Utils.deleteDirectoryRecursively(savePath.resolve(feat.getNetherPath()));
+                if(Files.exists(savePath.resolve(feat.getTheEndPath()))) Utils.deleteDirectoryRecursively(savePath.resolve(feat.getTheEndPath()));
             }
 
             e.printStackTrace();

@@ -28,6 +28,18 @@ public class SpigotSave extends BaseBukkitSave implements OPanelSave {
 
     @Rewrite
     @Override
+    public Path getNetherPath() {
+        return Path.of("dimensions/minecraft/the_nether");
+    }
+
+    @Rewrite
+    @Override
+    public Path getTheEndPath() {
+        return Path.of("dimensions/minecraft/the_end");
+    }
+
+    @Rewrite
+    @Override
     public OPanelDifficulty getDifficulty() throws IOException {
         if(isCurrent()) return OPanelDifficulty.fromId(getCurrentWorld().getDifficulty().getValue());
 
