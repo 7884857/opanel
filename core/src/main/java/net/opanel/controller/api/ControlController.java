@@ -124,6 +124,11 @@ public class ControlController extends BaseController {
     };
 
     public Handler restartServer = ctx -> {
+        final String launchCommand = Storage.get().getStoredData(StorageKey.LAUNCH_COMMAND);
+        if(launchCommand == null || launchCommand.isEmpty()) {
+            sendResponse(ctx, HttpStatus.NOT_ACCEPTABLE, "Launch command is not set.");
+            return;
+        }
         server.restart();
         sendResponse(ctx, HttpStatus.OK);
     };
@@ -252,6 +257,7 @@ public class ControlController extends BaseController {
             final String content = ctx.body();
             if(content.isEmpty()) {
                 sendResponse(ctx, HttpStatus.BAD_REQUEST, "Config content is missing.");
+                return;
             }
 
             if(worldName == null) {

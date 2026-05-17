@@ -17,7 +17,7 @@ English | [中文](README-zh.md)
 
 ## Description
 
-OPanel is a management panel for Minecraft server administrators, and it comes as a server-side plugin that can be run on Bukkit, Spigot, Paper, Fabric, Forge and NeoForge servers. With the web panel, you can manage your server in a more reliable, intuitive and simple way!
+OPanel is a management panel for Minecraft server administrators, and it comes as a server-side plugin that can be run on Bukkit, Spigot, Paper, Leaves, Fabric, Forge and NeoForge servers. With the web panel, you can manage your server in a more reliable, intuitive and simple way!
 
 ### Features
 
@@ -30,6 +30,8 @@ The features of OPanel include:
 - Plugin manager that allows you to enable / disable plugins or mods and view detailed plugin information.
 - Server terminal that can directly send messages or execute commands from the web panel.
 - Server logs manager and viewer.
+- MCP Server: You can use your AI agent (e.g. Claude Code, OpenClaw) to manage your server via [OPanel MCP](https://github.com/opanel-mc/opanel-mcp).
+- Open API: You can configure OPanel Open API to show real-time server status and statistics on the official website of your server.
 
 ### Screenshots
 
@@ -49,11 +51,11 @@ The features of OPanel include:
 
 ## Usage
 
-Read the [Quick Start](https://opanel.cn/docs/quick-start.html) to get started.
+Read the [Quick Start](https://opanel.cn/docs/quick-start) to get started.
 
 ## Contributing
 
-See [Contributing Guidelines](https://opanel.cn/docs/contributing.html) for more information.
+See [Contributing Guidelines](https://opanel.cn/docs/contributing) for more information.
 
 ## Friend Links
 
@@ -65,4 +67,4 @@ See [Contributing Guidelines](https://opanel.cn/docs/contributing.html) for more
 
 ## License
 
-[MPL-2.0](./LICENSE)
+[GPL-3.0](./LICENSE)

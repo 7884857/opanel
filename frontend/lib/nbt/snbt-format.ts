@@ -14,8 +14,24 @@ export function prettyFormatNBT(snbt: string): string {
   let result = "";
   let layer = 0;
   let strChar: string | null = null;
+  let escaped = false;
   for(let i = 0; i < snbt.length; i++) {
     const char = snbt[i];
+    if(strChar) {
+      if(escaped) {
+        escaped = false;
+        result += char;
+        continue;
+      }
+      if(char === "\\") {
+        escaped = true;
+        result += char;
+        continue;
+      }
+      if(char === strChar) strChar = null;
+      result += char;
+      continue;
+    }
     switch(char) {
       case "{":
       case "[":
@@ -39,11 +55,11 @@ export function prettyFormatNBT(snbt: string): string {
         break;
       case "\"":
       case "'":
-        strChar = strChar && strChar === char ? null : char;
+        strChar = char;
         result += char;
         break;
       case ":":
-        result += char + (strChar ? "" : " ");
+        result += char + " ";
         break;
       case ",":
         result += char + indent(layer);
@@ -60,5 +76,53 @@ export function prettyFormatNBT(snbt: string): string {
 
 export function minifyNBT(snbt: string): string {
   snbt = snbt.trim();
-  return snbt.replace(/\s+/g, "");
+
+  let result = "";
+  let strChar: string | null = null;
+  let escaped = false;
+
+  for(let i = 0; i < snbt.length; i++) {
+    const char = snbt[i];
+
+    if(strChar) {
+      // We are inside a quoted string; preserve all characters.
+      result += char;
+
+      if(escaped) {
+        // Current character is escaped; just consume it.
+        escaped = false;
+        continue;
+      }
+
+      if(char === "\\") {
+        // Start escape sequence.
+        escaped = true;
+        continue;
+      }
+
+      if(char === strChar) {
+        // End of string literal.
+        strChar = null;
+      }
+
+      continue;
+    }
+
+    // We are not inside a string.
+    if(char === "\"" || char === "'") {
+      // Start of a string literal.
+      strChar = char;
+      result += char;
+      continue;
+    }
+
+    // Outside strings, drop all whitespace.
+    if(/\s/.test(char)) {
+      continue;
+    }
+
+    result += char;
+  }
+
+  return result;
 }

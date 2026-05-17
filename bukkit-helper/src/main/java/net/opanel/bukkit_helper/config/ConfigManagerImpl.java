@@ -20,7 +20,9 @@ public class ConfigManagerImpl implements ConfigManager {
                 configSrc.getString("accessKey"),
                 configSrc.getString("salt"),
                 configSrc.getInt("webServerPort"),
-                configSrc.getBoolean("cookieSecure")
+                configSrc.getInt("mcdrSocketPort"),
+                configSrc.getBoolean("cookieSecure"),
+                configSrc.getBoolean("proxyHeaders")
         );
     }
 
@@ -29,7 +31,9 @@ public class ConfigManagerImpl implements ConfigManager {
         configSrc.set("accessKey", config.accessKey);
         configSrc.set("salt", config.salt);
         configSrc.set("webServerPort", config.webServerPort);
+        configSrc.set("mcdrSocketPort", config.mcdrSocketPort);
         configSrc.set("cookieSecure", config.cookieSecure);
+        configSrc.set("proxyHeaders", config.proxyHeaders);
         plugin.saveConfig();
     }
 }

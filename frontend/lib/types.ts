@@ -9,7 +9,7 @@ export type APIResponse<T> = {
   error: string
 } & T;
 
-export type ServerType = "Bukkit" | "Spigot" | "Paper" | "Fabric" | "Forge" | "Neoforge" | "Folia" | "Leaves";
+export type ServerType = "Bukkit" | "Spigot" | "Paper" | "Fabric" | "Forge" | "NeoForge" | "Folia" | "Leaves";
 
 export enum GameMode {
   ADVENTURE = "adventure",
@@ -107,23 +107,19 @@ export type EditorOptionsType = React.ComponentProps<typeof Editor>["options"];
 export enum AvatarProvider {
   MINOTAR = "https://minotar.net/avatar/",
   MINEATAR = "https://api.mineatar.io/face/",
-  MCHEADS = "https://api.mcheads.org/head/",
-  /** @see https://github.com/crafatar/crafatar/issues/329#issuecomment-3559253664 */
-  CRAFATAR = "https://avatars.cloudhaven.gg/avatars/"
+  MCHEADS = "https://api.mcheads.org/head/"
 }
 
 export enum SkinProvider {
   MINOTAR = "https://minotar.net/skin/",
   MINEATAR = "https://api.mineatar.io/skin/",
-  MCHEADS = "https://api.mcheads.org/skin/",
-  /** @see https://github.com/crafatar/crafatar/issues/329#issuecomment-3559253664 */
-  CRAFATAR = "https://avatars.cloudhaven.gg/skins/"
+  MCHEADS = "https://api.mcheads.org/skin/"
 }
 
-export enum CapeProvider {
-  /** @see https://github.com/crafatar/crafatar/issues/329#issuecomment-3559253664 */
-  CRAFATAR = "https://avatars.cloudhaven.gg/capes/"
-}
+// export enum CapeProvider {
+//   /** @see https://github.com/crafatar/crafatar/issues/329#issuecomment-3559253664 */
+//   CRAFATAR = "https://avatars.cloudhaven.gg/capes/"
+// }
 
 export interface CommandShortcut {
   name: string
@@ -134,6 +130,7 @@ export interface CommandShortcut {
 export interface VersionResponse {
   serverType: ServerType
   version: string
+  mcdr: boolean
 }
 
 /** `/api/info` */

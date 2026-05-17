@@ -41,7 +41,7 @@ export function DataTable<D, V>({
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
-  const [paginationState, setPaginationState] = useState({ pageIndex: 0, pageSize: 10 });
+  const [paginationState, setPaginationState] = useState({ pageIndex: 0, pageSize: 20 });
   const table = useReactTable({
     columns,
     data,
@@ -98,20 +98,18 @@ export function DataTable<D, V>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {
-                        header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )
-                      }
-                    </TableHead>
-                  )
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {
+                      header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )
+                    }
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>

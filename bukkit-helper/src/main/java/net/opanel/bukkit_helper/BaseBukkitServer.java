@@ -11,9 +11,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -53,8 +52,13 @@ public abstract class BaseBukkitServer implements OPanelServer {
 
     @Override
     public String getVersion() {
-        // getBukkitVersion() -> "<MinecraftVersion>-R0.x-SNAPSHOT"
-        return server.getBukkitVersion().split("-")[0];
+        String version = server.getBukkitVersion();
+        // "<MinecraftVersion>-R0.x-SNAPSHOT" -> MinecraftVersion
+        version = version.split("-")[0];
+        // "<MinecraftVersion>.build.<PaperBuildVersion>" -> MinecraftVersion
+        version = version.split(".build.")[0];
+
+        return version;
     }
 
     @Override
@@ -147,12 +151,11 @@ public abstract class BaseBukkitServer implements OPanelServer {
         // Get loaded plugins from Bukkit
         for(Plugin p : server.getPluginManager().getPlugins()) {
             PluginDescriptionFile desc = p.getDescription();
-            String fileName = URLDecoder.decode(p.getClass().getProtectionDomain().getCodeSource().getLocation().getPath(), StandardCharsets.UTF_8);
-            // Extract just the filename
-            fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
             
             try {
-                long fileSize = Files.size(pluginsPath.resolve(fileName));
+                File pluginFile = new File(p.getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
+                String fileName = pluginFile.getName();
+                long fileSize = Files.size(pluginFile.toPath());
 
                 plugins.add(new OPanelPlugin(
                         fileName,
@@ -168,7 +171,7 @@ public abstract class BaseBukkitServer implements OPanelServer {
                 ));
 
                 loadedPluginFileNames.add(fileName);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 //
             }
         }
@@ -223,18 +226,13 @@ public abstract class BaseBukkitServer implements OPanelServer {
             Path newPath = pluginsPath.resolve(fileName.replaceAll("\\"+ OPanelPlugin.DISABLED_SUFFIX +"$", ""));
             Files.move(originalPath, newPath);
         } else if(!isActuallyDisabled && !enabled) {
-            for(Plugin p : server.getPluginManager().getPlugins()) {
-                String itemName = URLDecoder.decode(p.getClass().getProtectionDomain().getCodeSource().getLocation().getPath(), StandardCharsets.UTF_8);
-                // Extract just the filename
-                itemName = itemName.substring(itemName.lastIndexOf('/') + 1);
-                if(fileName.equals(itemName)) {
-                    throw new IllegalStateException("Cannot disable a loaded plugin.");
-                }
-            }
-
             // Rename from .jar to .jar.disabled
             Path newPath = pluginsPath.resolve(fileName + OPanelPlugin.DISABLED_SUFFIX);
-            Files.move(originalPath, newPath);
+            try {
+                Files.move(originalPath, newPath);
+            } catch (Exception e) {
+                throw new IllegalStateException("Cannot disable a loaded plugin.");
+            }
         }
     }
 
@@ -252,7 +250,11 @@ public abstract class BaseBukkitServer implements OPanelServer {
             throw new NoSuchFileException("Plugin file not found: " + fileName);
         }
         
-        Files.delete(filePath);
+        try {
+            Files.delete(filePath);
+        } catch (Exception e) {
+            throw new IllegalStateException("Cannot delete a loaded plugin.");
+        }
     }
 }
 

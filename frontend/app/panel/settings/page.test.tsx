@@ -2,28 +2,31 @@ import type { ReactNode } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
+import { toast } from "sonner";
 import Settings from "./page";
 
 const mockReplace = vi.fn();
 let mockTab: string | null = null;
 let mockPathname: string;
 let mockQueryString: string;
+let mockHasOpenLaunchCommand = false;
 
 vi.mock("next/navigation", () => ({
   usePathname: () => mockPathname,
   useRouter: () => ({ replace: mockReplace }),
   useSearchParams: () => ({
     get: (key: string) => (key === "tab" ? mockTab : null),
+    has: (key: string) => key === "openLaunchCommand" ? mockHasOpenLaunchCommand : false,
     toString: () => mockQueryString
   })
 }));
 
 vi.mock("@/lib/settings", () => ({
   getSettings: vi.fn((key: string) => {
-    if (key === "dashboard.monitor-interval" || key === "terminal.font-size" || key === "monaco.font-size") return 14;
-    if (key === "terminal.max-log-lines" || key === "code-of-conduct.auto-saving-interval") return 1000;
-    if (key === "terminal.log-level") return "INFO";
-    if (key === "system.language") return "zh-CN";
+    if(key === "dashboard.monitor-interval" || key === "terminal.font-size" || key === "monaco.font-size") return 14;
+    if(key === "terminal.max-log-lines" || key === "code-of-conduct.auto-saving-interval") return 1000;
+    if(key === "terminal.log-level") return "INFO";
+    if(key === "system.language") return "zh-CN";
     return "";
   }),
   changeSettings: vi.fn(),
@@ -44,6 +47,7 @@ describe("test settings page", () => {
     vi.clearAllMocks();
     mockPathname = "/panel/settings";
     mockQueryString = "";
+    mockHasOpenLaunchCommand = false;
   });
 
   afterEach(() => {
@@ -115,5 +119,25 @@ describe("test settings page", () => {
     const callUrl = mockReplace.mock.calls[0][0];
     expect(callUrl).toContain("tab=players");
     expect(callUrl).toContain("foo=bar");
+  });
+
+  it("should switch to server tab and remove openLaunchCommand from URL when openLaunchCommand param is present", () => {
+    mockHasOpenLaunchCommand = true;
+    mockTab = null;
+    mockQueryString = "openLaunchCommand";
+
+    render(<Settings />);
+
+    expect(mockReplace).toHaveBeenCalledWith("/panel/settings?");
+  });
+
+  it("should show warning toast when openLaunchCommand param is present", () => {
+    mockHasOpenLaunchCommand = true;
+    mockTab = null;
+    mockQueryString = "openLaunchCommand";
+
+    render(<Settings />);
+
+    expect(vi.mocked(toast.warning)).toHaveBeenCalledWith("[settings.server.launch-command.required]");
   });
 });

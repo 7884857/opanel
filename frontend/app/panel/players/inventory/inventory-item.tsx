@@ -286,7 +286,7 @@ export function InventoryItem({
       {(itemStack.id !== AIR && !held) && (
         <div
           className={cn(
-            "fixed hidden whitespace-nowrap flex-col *:leading-5.5 z-20 cc-root",
+            "fixed hidden whitespace-nowrap flex-col *:leading-5.5 z-20 cc-root text-white",
             "bg-[rgba(0,0,0,.95)] outline-2 -outline-offset-4 outline-[rgb(41,5,96)] rounded-sm py-1 px-2",
             hovered && "flex",
             minecraftAE.className
@@ -328,7 +328,19 @@ export function InventoryItem({
           {/* Map ID */}
           {(resolvedNBT && resolvedNBT.getMapId() !== null) && (
             <span className="cc-7">
-              {$("filled_map.id" as any).replace("%s", resolvedNBT.getMapId()?.toString() ?? "")}
+              {$("filled_map.id").replace("%s", resolvedNBT.getMapId()?.toString() ?? "")}
+            </span>
+          )}
+          {/* Bee Amount */}
+          {(resolvedNBT && resolvedNBT.getBeeAmount() !== null) && (
+            <span className="cc-7">
+              {$("container.beehive.bees").replace("%s", resolvedNBT.getBeeAmount()?.toString() ?? "0").replace("%s", "3")}
+            </span>
+          )}
+          {/* Honey Level */}
+          {(resolvedNBT && resolvedNBT.getHoneyLevel() !== null) && (
+            <span className="cc-7">
+              {$("container.beehive.honey").replace("%s", resolvedNBT.getHoneyLevel()?.toString() ?? "0").replace("%s", "5")}
             </span>
           )}
           {/* Item ID */}

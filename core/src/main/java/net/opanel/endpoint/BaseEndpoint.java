@@ -56,8 +56,9 @@ public abstract class BaseEndpoint implements Connectable {
         });
 
         ws.onMessage(ctx -> {
-            if(!sessionListeners.containsKey(ctx.session)) return;
-            for(Consumer<WsMessageContext> listener : sessionListeners.get(ctx.session)) {
+            Set<Consumer<WsMessageContext>> listeners = sessionListeners.get(ctx.session);
+            if(listeners == null) return;
+            for(Consumer<WsMessageContext> listener : listeners) {
                 try {
                     listener.accept(ctx);
                 } catch (Exception e) {
@@ -67,12 +68,15 @@ public abstract class BaseEndpoint implements Connectable {
         });
 
         ws.onClose(ctx -> {
-            sessions.remove(ctx.session);
+            cleanupSession(ctx.session);
             onClose(ctx);
         });
 
         app.events(event -> {
-            event.serverStopping(this::closeAllSessions);
+            event.serverStopping(() -> {
+                closeAllSessions();
+                onShutdown();
+            });
         });
     }
 
@@ -83,6 +87,8 @@ public abstract class BaseEndpoint implements Connectable {
     }
 
     protected <D> void subscribe(Session session, String type, Class<D> dataClass, BiConsumer<WsMessageContext, D> cb) {
+        if(!sessions.contains(session)) return;
+
         Set<Consumer<WsMessageContext>> listeners = sessionListeners.computeIfAbsent(session, k -> new CopyOnWriteArraySet<>());
         listeners.add(ctx -> {
             if(ctx.session != session) return;
@@ -109,6 +115,9 @@ public abstract class BaseEndpoint implements Connectable {
     @Override
     public void onError(WsErrorContext ctx) { }
 
+    @Override
+    public void onShutdown() { }
+
     protected void sendErrorMessage(WsContext ctx, HttpStatus status) {
         ctx.send(new Packet<>(Packet.ERROR, status.getCode()));
     }
@@ -128,7 +137,7 @@ public abstract class BaseEndpoint implements Connectable {
     protected <D> void broadcast(Packet<D> packet) {
         for(Session session : sessions) {
             if(!session.isOpen()) {
-                sessions.remove(session);
+                cleanupSession(session);
                 continue;
             }
             sendMessage(session, packet);
@@ -142,5 +151,11 @@ public abstract class BaseEndpoint implements Connectable {
             }
         }
         sessions.clear();
+        sessionListeners.clear();
+    }
+
+    private void cleanupSession(Session session) {
+        sessions.remove(session);
+        sessionListeners.remove(session);
     }
 }

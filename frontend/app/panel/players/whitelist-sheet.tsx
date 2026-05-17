@@ -75,7 +75,7 @@ export function WhitelistSheet({
           {value && <MonacoEditor
             defaultLanguage="json"
             value={value}
-            theme={theme === "dark" ? "vs-dark" : "vs"}
+            theme={theme === "dark" ? "opanel-theme-dark" : "opanel-theme"}
             options={{
               minimap: { enabled: false },
               automaticLayout: true,
@@ -97,7 +97,9 @@ export function WhitelistSheet({
           <SheetClose asChild>
             <Button
               className="cursor-pointer"
-              onClick={() => saveServerWhitelist()}>{$("dialog.save")}</Button>
+              onClick={() => saveServerWhitelist()}>
+              {$("dialog.save")}
+            </Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

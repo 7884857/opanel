@@ -1,5 +1,8 @@
 package net.opanel.spigot_26_1;
 
+import com.cozooo.dlc_fileops_helper.FileOpsHelperConstants;
+import com.cozooo.dlc_fileops_helper.api.FileOpsHelperApi;
+import com.google.common.collect.Lists;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.tree.CommandNode;
 import net.opanel.annotation.Rewrite;
@@ -8,6 +11,7 @@ import net.opanel.bukkit_helper.utils.BukkitUtils;
 import net.opanel.common.*;
 import net.opanel.common.features.BukkitConfigFeature;
 import net.opanel.common.features.CodeOfConductFeature;
+import net.opanel.exception.ActLaterException;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
@@ -16,6 +20,7 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -179,36 +184,125 @@ public class SpigotServer extends BaseBukkitServer implements OPanelServer, Code
     public HashMap<String, Object> getGamerules() {
         final World world = server.getWorlds().getFirst();
         HashMap<String, Object> gamerules = new HashMap<>();
-        for(String key : world.getGameRules()) {
-            GameRule<?> rule = GameRule.getByName(key);
-            if(rule == null) continue;
-            gamerules.put(key, world.getGameRuleValue(rule));
+        try {
+            // Paper changed GameRule from interface to class, causing
+            // IncompatibleClassChangeError on any direct method call.
+            // All GameRule interactions must go through reflection.
+            // The same as setGamerules()
+            Class<?> gameRuleClass = GameRule.class;
+            Method getNamespacedKey = gameRuleClass.getMethod("getKey");
+            Method getKey = NamespacedKey.class.getMethod("getKey");
+            Method getGameRuleValue = World.class.getMethod("getGameRuleValue", gameRuleClass);
+
+            for(Object rule : Lists.newArrayList(Registry.GAME_RULE)) {
+                try {
+                    Object key = getNamespacedKey.invoke(rule);
+                    if(key == null) continue;
+                    gamerules.put((String) getKey.invoke(key), getGameRuleValue.invoke(world, (GameRule<?>) rule));
+                } catch (Exception e) {
+                    //
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return gamerules;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void setGamerules(HashMap<String, Object> gamerules) {
         HashMap<String, Object> currentGamerules = getGamerules();
         runner.runTask(() -> {
             final World world = server.getWorlds().getFirst();
-            gamerules.forEach((key, value) -> {
-                if(value == null) return;
-                final Object currentValue = currentGamerules.get(key);
-                if(value.equals(currentValue)) return;
-                GameRule<?> rule = GameRule.getByName(key);
-                if(rule == null) return;
+            try {
+                Class<?> gameRuleClass = GameRule.class;
+                Method getByName = gameRuleClass.getMethod("getByName", String.class);
+                Method setGameRule = World.class.getMethod("setGameRule", gameRuleClass, Object.class);
 
-                if(rule.getType().equals(Boolean.class)) { // boolean
-                    world.setGameRule((GameRule<Boolean>) rule, (Boolean) value);
-                } else if(rule.getType().equals(Integer.class)) { // integer
-                    int n = ((Number) value).intValue();
-                    world.setGameRule((GameRule<Integer>) rule, n);
-                } else { // string
-                    sendServerCommand("gamerule "+ key +" "+ value);
-                }
-            });
+                gamerules.forEach((key, value) -> {
+                    if(value == null) return;
+                    final Object currentValue = currentGamerules.get(key);
+                    if(value.equals(currentValue)) return;
+
+                    try {
+                        Object rule = getByName.invoke(null, key);
+                        if(rule == null) return;
+
+                        if(value instanceof Boolean) {
+                            setGameRule.invoke(world, (GameRule<?>) rule, value);
+                        } else if(value instanceof Number) {
+                            int n = ((Number) value).intValue();
+                            setGameRule.invoke(world, (GameRule<?>) rule, n);
+                        } else {
+                            sendServerCommand("gamerule "+ key +" "+ value);
+                        }
+                    } catch (Exception e) {
+                        sendServerCommand("gamerule "+ key +" "+ value);
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
+    }
+
+    @Rewrite
+    @Override
+    public void togglePlugin(String fileName, boolean enabled) throws IOException, ActLaterException {
+        Path pluginsPath = getPluginsPath();
+        Path originalPath = pluginsPath.resolve(fileName);
+        if(!Files.exists(originalPath)) {
+            throw new NoSuchFileException("Plugin file not found: " + fileName);
+        }
+
+        final boolean isActuallyDisabled = fileName.endsWith(OPanelPlugin.DISABLED_SUFFIX);
+
+        if(isActuallyDisabled && enabled) {
+            // Rename from .jar.disabled to .jar
+            Path newPath = pluginsPath.resolve(fileName.replaceAll("\\"+ OPanelPlugin.DISABLED_SUFFIX +"$", ""));
+            try {
+                Files.move(originalPath, newPath);
+            } catch (Exception e) {
+                FileOpsHelperApi.scheduleMove(originalPath.toString(), newPath.toString(), true);
+                throw new ActLaterException();
+            }
+        } else if(!isActuallyDisabled && !enabled) {
+            // Rename from .jar to .jar.disabled
+            Path newPath = pluginsPath.resolve(fileName + OPanelPlugin.DISABLED_SUFFIX);
+            try {
+                Files.move(originalPath, newPath);
+            } catch (Exception e) {
+                FileOpsHelperApi.scheduleMove(originalPath.toString(), newPath.toString(), true);
+                throw new ActLaterException();
+            }
+        } else if(!isActuallyDisabled) {
+            // Cancel the pending operation of renaming from .jar to .jar.disabled
+            Path targetPath = pluginsPath.resolve(fileName + OPanelPlugin.DISABLED_SUFFIX);
+            FileOpsHelperApi.cancelPendingOperationsByTarget(List.of(targetPath.toString()));
+            throw new ActLaterException();
+        }
+    }
+
+    @Rewrite
+    @Override
+    public void deletePlugin(String fileName) throws IOException, ActLaterException {
+        Path pluginsPath = getPluginsPath();
+        Path filePath = pluginsPath.resolve(fileName);
+
+        if(!Files.exists(filePath)) {
+            // Try with .disabled suffix
+            filePath = pluginsPath.resolve(fileName + OPanelPlugin.DISABLED_SUFFIX);
+        }
+
+        if(!Files.exists(filePath)) {
+            throw new NoSuchFileException("Plugin file not found: " + fileName);
+        }
+
+        try {
+            Files.delete(filePath);
+        } catch (Exception e) {
+            FileOpsHelperApi.scheduleDelete(List.of(filePath.toString()));
+            throw new ActLaterException();
+        }
     }
 }

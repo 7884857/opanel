@@ -4,6 +4,8 @@ import io.javalin.http.*;
 import net.opanel.OPanel;
 import net.opanel.common.OPanelPlugin;
 import net.opanel.controller.BaseController;
+import net.opanel.exception.ActLaterException;
+import net.opanel.utils.Callback;
 import net.opanel.utils.Utils;
 
 import java.io.IOException;
@@ -16,9 +18,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PluginsController extends BaseController {
     private final DownloadController downloadController = getControllerInstance(DownloadController.class);
+    private final ConcurrentHashMap<String, PendingOperation> pendingOperationMap = new ConcurrentHashMap<>();
+
+    enum PendingOperation {
+        ENABLED, DISABLED, DELETED;
+
+        boolean isEnabled() { return this == PendingOperation.ENABLED; }
+    }
 
     public PluginsController(OPanel plugin) {
         super(plugin);
@@ -29,6 +39,9 @@ public class PluginsController extends BaseController {
 
         List<HashMap<String, Object>> plugins = new ArrayList<>();
         for(OPanelPlugin p : server.getPlugins()) {
+            PendingOperation futureStatus = pendingOperationMap.get(p.getFileName());
+            if(futureStatus == PendingOperation.DELETED) continue;
+
             final String description = p.getDescription();
 
             HashMap<String, Object> pluginInfo = new HashMap<>();
@@ -40,7 +53,7 @@ public class PluginsController extends BaseController {
             pluginInfo.put("website", p.getWebsite());
             pluginInfo.put("icon", p.getIcon() != null ? "/api/plugins/icon/"+ p.getFileName() +"?t="+ System.currentTimeMillis() : null);
             pluginInfo.put("size", p.getFileSize());
-            pluginInfo.put("enabled", p.isEnabled());
+            pluginInfo.put("enabled", futureStatus != null ? futureStatus.isEnabled() : p.isEnabled());
             pluginInfo.put("loaded", p.isLoaded());
             plugins.add(pluginInfo);
         }
@@ -52,7 +65,7 @@ public class PluginsController extends BaseController {
 
     public Handler getPluginIcon = ctx -> {
         final String fileName = ctx.pathParam("fileName");
-        if(!fileName.endsWith(".jar") && !fileName.endsWith(".jar"+ OPanelPlugin.DISABLED_SUFFIX)) {
+        if(!isValidPluginFileName(fileName)) {
             sendResponse(ctx, HttpStatus.BAD_REQUEST, "Illegal file name.");
             return;
         }
@@ -87,6 +100,10 @@ public class PluginsController extends BaseController {
             }
 
             final String fileName = file.filename();
+            if(!Utils.isSafeFileName(fileName)) {
+                sendResponse(ctx, HttpStatus.BAD_REQUEST, "Illegal file name.");
+                return;
+            }
             if(!fileName.endsWith(".jar")) {
                 sendResponse(ctx, HttpStatus.BAD_REQUEST, "Plugin file should be a .jar file.");
                 return;
@@ -116,7 +133,7 @@ public class PluginsController extends BaseController {
     public Handler togglePlugin = ctx -> {
         final String fileName = ctx.pathParam("fileName");
         final String enabled = ctx.queryParam("enabled");
-        if(!fileName.endsWith(".jar") && !fileName.endsWith(".jar"+ OPanelPlugin.DISABLED_SUFFIX)) {
+        if(!isValidPluginFileName(fileName)) {
             sendResponse(ctx, HttpStatus.BAD_REQUEST, "Illegal file name.");
             return;
         }
@@ -126,18 +143,16 @@ public class PluginsController extends BaseController {
             return;
         }
 
-        for(OPanelPlugin plugin : server.getPlugins()) {
-            if(fileName.equals(plugin.getFileName()) && plugin.isLoaded()) {
-                sendResponse(ctx, HttpStatus.FORBIDDEN, "Cannot disable a loaded plugin.");
-                return;
-            }
-        }
-
         try {
             server.togglePlugin(fileName, enabled.equals("1"));
             sendResponse(ctx, HttpStatus.OK);
+        } catch (ActLaterException e) {
+            pendingOperationMap.put(fileName, enabled.equals("1") ? PendingOperation.ENABLED : PendingOperation.DISABLED);
+            sendResponse(ctx, HttpStatus.ACCEPTED);
         } catch (NoSuchFileException e) {
             sendResponse(ctx, HttpStatus.NOT_FOUND, "Cannot find the plugin.");
+        } catch (IllegalStateException e) {
+            sendResponse(ctx, HttpStatus.FORBIDDEN, "Cannot disable a loaded plugin.");
         } catch (Exception e) {
             e.printStackTrace();
             sendResponse(ctx, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
@@ -146,23 +161,21 @@ public class PluginsController extends BaseController {
 
     public Handler deletePlugin = ctx -> {
         final String fileName = ctx.pathParam("fileName");
-        if(!fileName.endsWith(".jar") && !fileName.endsWith(".jar"+ OPanelPlugin.DISABLED_SUFFIX)) {
+        if(!isValidPluginFileName(fileName)) {
             sendResponse(ctx, HttpStatus.BAD_REQUEST, "Illegal file name.");
             return;
-        }
-
-        for(OPanelPlugin plugin : server.getPlugins()) {
-            if(fileName.equals(plugin.getFileName()) && plugin.isLoaded()) {
-                sendResponse(ctx, HttpStatus.FORBIDDEN, "Cannot delete a loaded plugin.");
-                return;
-            }
         }
 
         try {
             server.deletePlugin(fileName);
             sendResponse(ctx, HttpStatus.OK);
+        } catch (ActLaterException e) {
+            pendingOperationMap.put(fileName, PendingOperation.DELETED);
+            sendResponse(ctx, HttpStatus.ACCEPTED);
         } catch (NoSuchFileException e) {
             sendResponse(ctx, HttpStatus.NOT_FOUND, "Cannot find the plugin.");
+        } catch (IllegalStateException e) {
+            sendResponse(ctx, HttpStatus.FORBIDDEN, "Cannot delete a loaded plugin.");
         } catch (Exception e) {
             e.printStackTrace();
             sendResponse(ctx, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
@@ -171,7 +184,7 @@ public class PluginsController extends BaseController {
 
     public Handler downloadPlugin = ctx -> {
         final String fileName = ctx.pathParam("fileName");
-        if(!fileName.endsWith(".jar") && !fileName.endsWith(".jar"+ OPanelPlugin.DISABLED_SUFFIX)) {
+        if(!isValidPluginFileName(fileName)) {
             sendResponse(ctx, HttpStatus.BAD_REQUEST, "Illegal file name.");
             return;
         }
@@ -192,4 +205,9 @@ public class PluginsController extends BaseController {
         final String downloadId = downloadController.registerPath(filePath);
         ctx.redirect("/file/"+ downloadId +"/"+ fileName.replaceAll("\\"+ OPanelPlugin.DISABLED_SUFFIX +"$", ""));
     };
+
+    private boolean isValidPluginFileName(String fileName) {
+        return Utils.isSafeFileName(fileName)
+                && (fileName.endsWith(".jar") || fileName.endsWith(".jar"+ OPanelPlugin.DISABLED_SUFFIX));
+    }
 }

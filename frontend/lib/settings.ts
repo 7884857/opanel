@@ -3,28 +3,20 @@ import type { ConsoleLogLevel } from "./ws/terminal";
 import type { ConfigFile } from "@/app/panel/bukkit-config/page";
 import {
   AvatarProvider,
-  CapeProvider,
   type CommandShortcut,
   SkinProvider,
   type EditorOptionsType
 } from "./types";
-import { isPreviewVersion } from "./utils";
+import { getLocalStorage, isPreviewVersion } from "./utils";
 import { version } from "./global";
 
 const storageKey = "opanel.settings";
-
-function getLocalStorage() {
-  if(typeof window !== "undefined" && window.localStorage) {
-    return window.localStorage;
-  }
-  throw new Error("localStorage is not defined.");
-}
 
 export type SettingsStorageType = {
   "dashboard.monitor-interval": number
   "players.avatar-provider": AvatarProvider | string
   "players.skin-provider": SkinProvider | string
-  "players.cape-provider": CapeProvider | string
+  // "players.cape-provider": CapeProvider | string
   "terminal.autocomplete": boolean
   "terminal.word-wrap": boolean
   "terminal.font-size": number
@@ -56,7 +48,7 @@ const defaultSettings: SettingsStorageType = {
   "dashboard.monitor-interval": 2000, // ms
   "players.avatar-provider": AvatarProvider.MINOTAR,
   "players.skin-provider": SkinProvider.MINOTAR,
-  "players.cape-provider": CapeProvider.CRAFATAR,
+  // "players.cape-provider": CapeProvider.CRAFATAR,
   "terminal.autocomplete": true,
   "terminal.word-wrap": false,
   "terminal.font-size": 12, // px

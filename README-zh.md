@@ -17,7 +17,7 @@
 
 ## 简介
 
-OPanel 是一个为 Minecraft 服务器管理员制作的管理面板，它以服务端插件的形式运行，支持 Bukkit、Spigot、Paper、Fabric、Forge 和 NeoForge 服务器。通过网页端面板，您可以以更可靠、直观和简便的方式管理您的服务器！
+OPanel 是一个为 Minecraft 服务器管理员制作的管理面板，它以服务端插件的形式运行，支持 Bukkit、Spigot、Paper、Leaves、Fabric、Forge 和 NeoForge 服务器。通过网页端面板，您可以以更可靠、直观和简便的方式管理您的服务器！
 
 ### 功能特性
 
@@ -30,6 +30,8 @@ OPanel 的功能包括：
 - 插件管理器：帮助您启用 / 禁用插件或模组，或查看插件的详细信息
 - 终端控制台：可以直接从 Web 面板发送消息或执行命令
 - 服务器日志管理器和查看器
+- MCP 服务器: 通过[OPanel MCP](https://github.com/opanel-mc/opanel-mcp)，您可以使用AI智能体助手 (如 Claude Code, OpenClaw) 来管理您的服务器
+- 开放 API: 您可以通过配置 OPanel 的开放 API，在服务器官网展示实时服务器状态和数据
 
 ### 预览
 
@@ -49,11 +51,11 @@ OPanel 的功能包括：
 
 ## 用法
 
-请阅读[快速开始](https://opanel.cn/docs/quick-start.html)。
+请阅读[快速开始](https://opanel.cn/docs/quick-start)。
 
 ## 贡献
 
-查看[贡献指南](https://opanel.cn/docs/contributing.html)以了解更多信息。
+查看[贡献指南](https://opanel.cn/docs/contributing)以了解更多信息。
 
 ## 友情链接
 
@@ -65,4 +67,4 @@ OPanel 的功能包括：
 
 ## License
 
-[MPL-2.0](./LICENSE)
+[GPL-3.0](./LICENSE)

@@ -21,12 +21,15 @@ export interface ConsoleLog {
   source: string
   line: string
   thrownMessage: string | null
+  mcdr: boolean
+  uuid?: string
 }
 
 export type TerminalMessageType = (
   /* server packet */
   "init"
   | "log"
+  | "mcdr-log"
   /* client packet */
   | "command"
   /* common packet */

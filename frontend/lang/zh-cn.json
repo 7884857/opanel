@@ -15,6 +15,7 @@
   "common.copy.success": "复制成功",
   "common.copy.error": "复制失败",
   "common.controls.restart": "正在重启服务器...",
+  "common.controls.restart.error": "重启服务器失败",
   "common.controls.stop": "正在停止服务器...",
 
   "restart-alert.title": "需要重启服务器以使改动生效",
@@ -107,6 +108,9 @@
 
   "dashboard.title": "仪表盘",
   "dashboard.error": "无法连接到服务器",
+  "dashboard.empty.title": "仪表盘加载失败",
+  "dashboard.empty.description": "尝试刷新页面、使用{0}打开浏览器控制台，或检查服务器后台日志，并向OPanel反馈问题",
+  "dashboard.empty.refresh": "刷新",
   "dashboard.info.version": "版本:",
   "dashboard.info.port": "端口:",
   "dashboard.info.status.running": "正在运行",
@@ -147,7 +151,7 @@
   "dashboard.system.item.core": "核心数",
   "dashboard.system.item.memory": "内存",
   "dashboard.terminal.title": "服务器后台",
-  "dashboard.terminal.input.placeholder": "发送消息 / 指令...",
+  "dashboard.terminal.input.placeholder": "发送指令...",
   "dashboard.terminal.input.tooltip": "转至后台页面",
   "dashboard.favicon.title": "修改服务器图标",
   "dashboard.favicon.description": "在此上传图片作为服务器的新图标。",
@@ -380,7 +384,7 @@
   "terminal.title": "后台",
   "terminal.ws.error": "无法连接到终端WebSocket",
   "terminal.input.empty": "请输入指令以发送",
-  "terminal.input.placeholder": "发送消息 / 指令...",
+  "terminal.input.placeholder": "发送指令...",
   "terminal.fullscreen": "全屏",
   "terminal.exit-fullscreen": "退出全屏",
   "terminal.send": "发送",
@@ -398,6 +402,7 @@
   "logs.title": "日志",
   "logs.description": "管理和查看服务器的所有日志文件",
   "logs.fetch.error": "无法获取日志列表",
+  "logs.search.placeholder": "搜索日志...",
   "logs.clear": "清空日志",
   "logs.clear.success": "已清空除当前日志外的所有日志",
   "logs.clear.error": "清空日志失败",
@@ -572,6 +577,7 @@
   "settings.server.launch-command.fetch.error": "获取启动命令失败",
   "settings.server.launch-command.save.success": "启动命令保存成功",
   "settings.server.launch-command.save.error": "保存启动命令失败",
+  "settings.server.launch-command.required": "请先设置启动命令后再尝试重启服务器",
   "settings.system.language": "语言",
   "settings.system.mcp": "MCP服务器",
   "settings.system.mcp.description": "配置MCP服务器，以实现大模型对OPanel的操作",
@@ -611,5 +617,6 @@
   "settings.update.status.latest": "当前已是最新版本",
   "settings.update.release-note.title": "{0} 更新日志",
   "settings.update.preview-channel": "预览版",
+  "settings.update.download-update": "下载更新",
   "settings.reset": "恢复默认设置"
 }
